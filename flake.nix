@@ -2,10 +2,10 @@
   description = "One flake to rule mac (nix-darwin), NixOS VM, NixOS PC.";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
-    darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-untable";
+    darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-unstable";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.url = "github:nix-community/home-manager/release-unstable";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
