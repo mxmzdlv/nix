@@ -2,11 +2,11 @@
 
 { config, lib, pkgs, ... }:
 
-# let
-#   sources = import ../../nix/sources.nix;
-#   isDarwin = pkgs.stdenv.isDarwin;
-#   isLinux = pkgs.stdenv.isLinux;
-
+let
+  # sources = import ../../nix/sources.nix;
+  isDarwin = pkgs.stdenv.isDarwin;
+  isLinux = pkgs.stdenv.isLinux;
+in {
 #   shellAliases = {
 #     ga = "git add";
 #     gc = "git commit";
@@ -289,4 +289,4 @@
 #     size = 128;
 #     x11.enable = true;
 #   };
-# }
+}
