@@ -12,8 +12,8 @@
   outputs = { self, nixpkgs, darwin, home-manager, ... }:
   let
     # Adjust these if your arch differs:
-    macSystem = "aarch64-darwin";   # or "x86_64-darwin"
-    linuxSystem = "x86_64-linux";   # or "aarch64-linux"
+    macSystem = "aarch64-darwin";
+    linuxSystem = "aarch64-linux";
 
     mkHMUser = username: { pkgs, ... }: {
       home-manager.useGlobalPkgs = true;
@@ -27,15 +27,15 @@
     ];
   in {
     nixosConfigurations = {
-      pc = nixpkgs.lib.nixosSystem {
-        system = linuxSystem;
-        modules = sharedModules ++ [
-          ./hosts/pc/hardware-configuration.nix
-          ./hosts/pc
-          home-manager.nixosModules.home-manager
-          (mkHMUser "maxim")
-        ];
-      };
+      # pc = nixpkgs.lib.nixosSystem {
+      #   system = linuxSystem;
+      #   modules = sharedModules ++ [
+      #     ./hosts/pc/hardware-configuration.nix
+      #     ./hosts/pc
+      #     home-manager.nixosModules.home-manager
+      #     (mkHMUser "maxim")
+      #   ];
+      # };
 
       vm = nixpkgs.lib.nixosSystem {
         system = linuxSystem;
@@ -48,19 +48,15 @@
       };
     };
 
-    darwinConfigurations = {
-      mac = darwin.lib.darwinSystem {
-        system = macSystem;
-        modules = sharedModules ++ [
-          ./hosts/mac
-          home-manager.darwinModules.home-manager
-          (mkHMUser "maxim")
-        ];
-      };
-    };
-
-    # So `nix fmt` works:
-    formatter.${macSystem} = nixpkgs.legacyPackages.${macSystem}.nixpkgs-fmt;
-    formatter.${linuxSystem} = nixpkgs.legacyPackages.${linuxSystem}.nixpkgs-fmt;
+    # darwinConfigurations = {
+    #   mac = darwin.lib.darwinSystem {
+    #     system = macSystem;
+    #     modules = sharedModules ++ [
+    #       ./hosts/mac
+    #       home-manager.darwinModules.home-manager
+    #       (mkHMUser "maxim")
+    #     ];
+    #   };
+    # };
   };
 }
