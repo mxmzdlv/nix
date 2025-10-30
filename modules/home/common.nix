@@ -6,6 +6,7 @@ let
   isLinux  = pkgs.stdenv.isLinux;
 in
 {
+  home.stateVersion = "25.05"
   home.sessionVariables = {
     LANG = "en_US.UTF-8";
   } // (if isDarwin then {} else {});
