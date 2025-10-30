@@ -14,6 +14,6 @@ in
   # Shared Ghostty configuration used on both Darwin and Linux
   xdg.configFile = {
     "ghostty/config".text = builtins.readFile ./ghostty;
-  }
+  };
 
 }
