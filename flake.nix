@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-untable";
-    darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-unstable";
+    darwin.url = "github:nix-darwin/nix-darwin/master";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager/release-unstable";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
