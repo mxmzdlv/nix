@@ -107,6 +107,17 @@
   services.xserver.enable = true;
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
+
+
+  extraGSettingsOverridePackages = [ pkgs.mutter ];
+  extraGSettingsOverrides = ''
+    [org.gnome.mutter]
+    experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']
+    [org/gnome/desktop/interface]
+    scaling-factor=1.5
+  '';
+  };
+
   virtualisation.vmware.guest.enable = true;
 
   programs.fuse.userAllowOther = true;
