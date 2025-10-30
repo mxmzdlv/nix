@@ -116,7 +116,6 @@
     [org/gnome/desktop/interface]
     scaling-factor=1.5
   '';
-  };
 
   virtualisation.vmware.guest.enable = true;
 
