@@ -6,19 +6,14 @@ let
   isLinux  = pkgs.stdenv.isLinux;
 in
 {
-  home.stateVersion = "25.05";
+  home.stateVersion = "25.11";
   home.sessionVariables = {
     LANG = "en_US.UTF-8";
   } // (if isDarwin then {} else {});
 
   # Shared Ghostty configuration used on both Darwin and Linux
-  programs.ghostty = {
-    enable = true;
-    settings =
-      {
-        theme = "niji";
-      }
-      // lib.optionalAttrs isDarwin {
-      };
-  };
+  xdg.configFile = {
+    "ghostty/config".text = builtins.readFile ./ghostty;
+  }
+
 }
