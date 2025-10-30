@@ -10,4 +10,15 @@ in
   home.sessionVariables = {
     LANG = "en_US.UTF-8";
   } // (if isDarwin then {} else {});
+
+  # Shared Ghostty configuration used on both Darwin and Linux
+  programs.ghostty = {
+    enable = true;
+    settings =
+      {
+        theme = "niji";
+      }
+      // lib.optionalAttrs isDarwin {
+      };
+  };
 }
