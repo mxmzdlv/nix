@@ -109,8 +109,8 @@
   services.xserver.desktopManager.gnome.enable = true;
 
 
-  extraGSettingsOverridePackages = [ pkgs.mutter ];
-  extraGSettingsOverrides = ''
+  desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
+  desktopManager.gnome.extraGSettingsOverrides = ''
     [org.gnome.mutter]
     experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']
     [org/gnome/desktop/interface]
