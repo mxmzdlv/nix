@@ -98,20 +98,19 @@ in {
 #   # Env vars and dotfiles
 #   #---------------------------------------------------------------------
 
-#   home.sessionVariables = {
-#     LANG = "en_US.UTF-8";
-#     LC_CTYPE = "en_US.UTF-8";
-#     LC_ALL = "en_US.UTF-8";
-#     EDITOR = "nvim";
-#     PAGER = "less -FirSwX";
-#     MANPAGER = "${manpager}/bin/manpager";
-
-#     AMP_API_KEY = "op://Private/Amp_API/credential";
-#     OPENAI_API_KEY = "op://Private/OpenAPI_Personal/credential";
-#   } // (if isDarwin then {
-#     # See: https://github.com/NixOS/nixpkgs/issues/390751
-#     DISPLAY = "nixpkgs-390751";
-#   } else {});
+  home.sessionVariables = {
+    LANG = "en_US.UTF-8";
+    # LC_ALL = "en_US.UTF-8";
+    # EDITOR = "nvim";
+    # PAGER = "less -FirSwX";
+    # MANPAGER = "${manpager}/bin/manpager";
+#
+    # AMP_API_KEY = "op://Private/Amp_API/credential";
+    # OPENAI_API_KEY = "op://Private/OpenAPI_Personal/credential";
+  } // (if isDarwin then {
+    # See: https://github.com/NixOS/nixpkgs/issues/390751
+    # DISPLAY = "nixpkgs-390751";
+  } else {});
 
 #   home.file = {
 #     ".gdbinit".source = ./gdbinit;
