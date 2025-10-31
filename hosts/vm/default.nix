@@ -2,8 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
+let
+  # 24.05+ renamed hardware.opengl → hardware.graphics. Support either.
+  hasGraphics = lib.hasAttr "graphics" config.hardware;
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -63,51 +67,90 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  hardware.opengl = {
+  ############################################
+  # VMware guest + graphics
+  ############################################
+  virtualisation.vmware.guest.enable = true;     # open-vm-tools, udev rules, etc.
+  services.xserver.videoDrivers = [ "vmware" ];  # loads vmwgfx (DRM/KMS) for Wayland
+
+  # GL stack (pick the right option based on your NixOS release)
+  hardware.graphics = lib.mkIf hasGraphics {
     enable = true;
+    enable32Bit = true;
+  };
+  hardware.opengl = lib.mkIf (!hasGraphics) {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
   };
 
-  environment.sessionVariables = {
-    WLR_RENDERER_ALLOW_SOFTWARE = "1";
+  ############################################
+  # Hyprland (wlroots Wayland compositor)
+  ############################################
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;   # X apps under Wayland
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  # Optional: log into Hyprland via a display manager (SDDM/Wayland)
+  services.xserver.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
+  services.displayManager.defaultSession = "hyprland";
+
+  ############################################
+  # Portals, audio, auth prompts
+  ############################################
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-hyprland pkgs.xdg-desktop-portal-gtk ];
+    config.common.default = [ "hyprland" "gtk" ];
+  };
+
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
+    jack.enable = true;
+    wireplumber.enable = true;
+  };
+
+  security.polkit.enable = true;
+
+  ############################################
+  # Helpful packages
+  ############################################
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
-    mesa-demos
-    zed-editor
-    ghostty
-    hypridle
-    hyprlock
-    hyprpaper
     waybar
+    hyprpaper
+    hyprlock
+    rofi-wayland
     wl-clipboard
     grim
     slurp
+    foot
+    hypridle
+    ghostty
+    zed-editor
+    mesa-demos
     wofi
-
   ];
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  ############################################
+  # VMware + wlroots quirks (safe to keep)
+  ############################################
+  environment.variables = {
+    # Fixes invisible/blinky cursor with vmwgfx in some VMware versions
+    WLR_NO_HARDWARE_CURSORS = "1";
 
-  # List services that you want to enable:
+    # If 3D accel isn't actually available, allow llvmpipe rather than hard-failing
+    WLR_RENDERER_ALLOW_SOFTWARE = "1";
 
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
+    # Use systemd-logind for seat management (no separate seatd service needed on NixOS)
+    LIBSEAT_BACKEND = "logind";
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+    XDG_SESSION_TYPE = "wayland";
+  ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -116,40 +159,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
-
-  services.xserver.enable = false;
-
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-  };
-
-  xdg.portal = {
-    enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal-hyprland
-    ];
-    config = {
-      common = {
-        default = [ "hyprland" "gtk" ];
-      };
-    };
-  };
-
-  services.seatd.enable = true;
-
-  services.greetd = {
-    enable = true;
-    settings = {
-      default_session = {
-        command = "${pkgs.hyprland}/bin/Hyprland";
-        user = "maxim";
-      };
-    };
-  };
-
-
-  virtualisation.vmware.guest.enable = true;
-
 }
