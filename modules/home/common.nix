@@ -12,12 +12,9 @@ in
   } // (if isDarwin then {} else {});
 
   nixpkgs.config.allowUnfree = true;
+  chrome = pkgs.google-chrome;
 
-  home.packages =
-    let
-      chrome = pkgs.google-chrome;
-      chromeSupported = lib.meta.availableOn pkgs.stdenv.hostPlatform.system chrome;
-    in if chromeSupported then [ chrome ] else [];
+  home.packages = [ pkgs.google-chrome ];
 
   # Shared Ghostty configuration used on both Darwin and Linux
   xdg.configFile = {
