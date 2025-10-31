@@ -79,6 +79,10 @@
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
+    gnome-tweaks
+    gnome-themes-extra
+    gnome-user-share
+    gnomeExtensions.appindicator
     mesa-demos
     zed-editor
     ghostty
@@ -111,18 +115,17 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-  };
+  services.xserver.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
 
-  # environment.sessionVariables = {
-  #   WLR_RENDERER = "vulkan";
-  #   WLR_RENDERER_ALLOW_SOFTWARE = "1";
-  #   LIBGL_ALWAYS_SOFTWARE = "1";
-  #   WLR_DRM_NO_ATOMIC = "1";
-  #   WLR_NO_HARDWARE_CURSORS = "1";
-  # };
+  services.xserver.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
+  services.xserver.desktopManager.gnome.extraGSettingsOverrides = ''
+    [org.gnome.mutter]
+    experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']
+    [org/gnome/desktop/interface]
+    scaling-factor=1.5
+  '';
 
   virtualisation.vmware.guest.enable = true;
 
