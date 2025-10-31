@@ -15,9 +15,12 @@ in
     enable = true;
   };
 
-  # Shared Ghostty configuration used on both Darwin and Linux
+  home.packages = [ pkgs.zed-editor ];
+
+  # Shared application configuration synced into XDG config directory
   xdg.configFile = {
     "ghostty/config".text = builtins.readFile ./ghostty;
+    "zed/settings.json".source = ./zed.json;
   };
 
 }
