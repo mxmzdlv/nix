@@ -52,7 +52,7 @@
   users.users.maxim = {
     isNormalUser = true;
     description = "maxim";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "seat" ];
     shell = pkgs.fish;
     packages = with pkgs; [];
   };
@@ -109,14 +109,7 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
-  services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.displayManager.gdm.autoLogin = {
-    enable = true;
-    user = "maxim";
-  };
-  services.xserver.displayManager.defaultSession = "hyprland";
-  services.xserver.displayManager.sessionPackages = [ pkgs.hyprland ];
+  services.xserver.enable = false;
 
   programs.hyprland = {
     enable = true;
@@ -132,6 +125,19 @@
     config = {
       common = {
         default = [ "hyprland" "gtk" ];
+      };
+    };
+    gtkUsePortal = true;
+  };
+
+  services.seatd.enable = true;
+
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "${pkgs.hyprland}/bin/Hyprland";
+        user = "maxim";
       };
     };
   };
