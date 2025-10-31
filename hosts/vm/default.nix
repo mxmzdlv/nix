@@ -13,6 +13,9 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelParams = [
+    "video=Virtual-1:2560x1600@60"
+  ];
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -53,10 +56,11 @@
     enable32Bit = false;
     extraPackages = with pkgs; [
       mesa.drivers
+      mesa-vulkan-drivers
     ];
   };
 
-  services.xserver.videoDrivers = [ "virtio" "vmware" ];
+  services.xserver.videoDrivers = [ "virtio" ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.maxim = {
@@ -116,11 +120,11 @@
   };
 
   environment.sessionVariables = {
-    WLR_DRM_NO_ATOMIC = "1";
-    WLR_NO_HARDWARE_CURSORS = "1";
+    WLR_RENDERER = "vulkan";
     WLR_RENDERER_ALLOW_SOFTWARE = "1";
     LIBGL_ALWAYS_SOFTWARE = "1";
-    MESA_LOADER_DRIVER_OVERRIDE = "llvmpipe";
+    WLR_DRM_NO_ATOMIC = "1";
+    WLR_NO_HARDWARE_CURSORS = "1";
   };
 
   virtualisation.vmware.guest.enable = true;
