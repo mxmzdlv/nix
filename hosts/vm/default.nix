@@ -56,7 +56,6 @@
     enable32Bit = false;
     extraPackages = with pkgs; [
       mesa
-      mesa.vulkan-drivers
     ];
   };
 
@@ -119,13 +118,13 @@
     xwayland.enable = true;
   };
 
-  environment.sessionVariables = {
-    WLR_RENDERER = "vulkan";
-    WLR_RENDERER_ALLOW_SOFTWARE = "1";
-    LIBGL_ALWAYS_SOFTWARE = "1";
-    WLR_DRM_NO_ATOMIC = "1";
-    WLR_NO_HARDWARE_CURSORS = "1";
-  };
+  # environment.sessionVariables = {
+  #   WLR_RENDERER = "vulkan";
+  #   WLR_RENDERER_ALLOW_SOFTWARE = "1";
+  #   LIBGL_ALWAYS_SOFTWARE = "1";
+  #   WLR_DRM_NO_ATOMIC = "1";
+  #   WLR_NO_HARDWARE_CURSORS = "1";
+  # };
 
   virtualisation.vmware.guest.enable = true;
 
