@@ -11,9 +11,9 @@ in
     LANG = "en_US.UTF-8";
   } // (if isDarwin then {} else {});
 
-  nixpkgs.config.allowUnfree = true;
-
-  home.packages = [ pkgs.google-chrome ];
+  programs.chromium = {
+    enable = true;
+  };
 
   # Shared Ghostty configuration used on both Darwin and Linux
   xdg.configFile = {
