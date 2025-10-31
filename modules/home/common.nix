@@ -24,18 +24,8 @@ in
   };
 
   home.packages = [
-    pkgs.walker
     pkgs.zed-editor
   ];
-
-  wayland.windowManager.hyprland = {
-    enable = true;
-    settings = {
-      bind = [
-        "SUPER, RETURN, exec, ghostty"
-      ];
-    };
-  };
 
   # Shared application configuration synced into XDG config directory
   xdg.configFile = {
