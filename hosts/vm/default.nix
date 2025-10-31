@@ -111,8 +111,9 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
-  services.displayManager.cosmic-greeter.enable = true;
-  services.desktopManager.cosmic.enable = true;
+  services.xserver.enable = true;
+  services.xserver.displayManager.cosmic-greeter.enable = true;
+  services.xserver.desktopManager.cosmic.enable = true;
 
   virtualisation.vmware.guest.enable = true;
 
