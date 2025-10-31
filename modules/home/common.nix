@@ -31,4 +31,8 @@ in
     "zed/settings.json".source = ./zed.json;
   };
 
+  wayland.windowManager.hyprland = lib.mkIf isLinux {
+    enable = true;
+  };
+
 }
