@@ -28,7 +28,7 @@ in
     pkgs.zed-editor
   ];
 
-  wayland.windowManager.hyprland = lib.mkIf isLinux {
+  wayland.windowManager.hyprland = {
     enable = true;
     settings = {
       bind = [
