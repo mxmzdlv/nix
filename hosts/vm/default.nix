@@ -48,6 +48,16 @@
     variant = "";
   };
 
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = false;
+    extraPackages = with pkgs; [
+      mesa.drivers
+    ];
+  };
+
+  services.xserver.videoDrivers = [ "virtio" "vmware" ];
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.maxim = {
     isNormalUser = true;
@@ -107,9 +117,10 @@
 
   environment.sessionVariables = {
     WLR_DRM_NO_ATOMIC = "1";
+    WLR_NO_HARDWARE_CURSORS = "1";
     WLR_RENDERER_ALLOW_SOFTWARE = "1";
-    __GLX_VENDOR_LIBRARY_NAME = "mesa";
     LIBGL_ALWAYS_SOFTWARE = "1";
+    MESA_LOADER_DRIVER_OVERRIDE = "llvmpipe";
   };
 
   virtualisation.vmware.guest.enable = true;
