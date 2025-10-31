@@ -127,7 +127,6 @@
         default = [ "hyprland" "gtk" ];
       };
     };
-    gtkUsePortal = true;
   };
 
   services.seatd.enable = true;
