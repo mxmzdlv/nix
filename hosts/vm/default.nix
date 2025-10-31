@@ -115,7 +115,12 @@
 
   services.xserver.enable = true;
   services.xserver.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm.autoLogin = {
+    enable = true;
+    user = "maxim";
+  };
   services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.sessionPackages = [ pkgs.hyprland ];
 
   programs.hyprland = {
     enable = true;
