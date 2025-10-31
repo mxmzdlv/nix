@@ -55,7 +55,7 @@
     enable = true;
     enable32Bit = false;
     extraPackages = with pkgs; [
-      mesa.drivers
+      mesa
       mesa-vulkan-drivers
     ];
   };
