@@ -23,7 +23,10 @@ in
     package = if canUseChrome then pkgs.google-chrome else pkgs.chromium;
   };
 
-  home.packages = [ pkgs.zed-editor ];
+  home.packages = [
+    pkgs.walker
+    pkgs.zed-editor
+  ];
 
   # Shared application configuration synced into XDG config directory
   xdg.configFile = {
