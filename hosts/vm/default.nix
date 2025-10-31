@@ -63,6 +63,16 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  hardware.opengl = {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
+  };
+
+  environment.sessionVariables = {
+    WLR_RENDERER_ALLOW_SOFTWARE = "1";
+  };
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
