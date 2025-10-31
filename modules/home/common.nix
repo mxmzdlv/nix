@@ -11,16 +11,9 @@ in
     LANG = "en_US.UTF-8";
   } // (if isDarwin then {} else {});
 
-  programs.chromium = let
-    hostSystem = pkgs.stdenv.hostPlatform.system;
-    chromeMetaPlatforms =
-      if pkgs ? google-chrome
-      then (pkgs.google-chrome.meta.platforms or [])
-      else [];
-    canUseChrome = lib.elem hostSystem chromeMetaPlatforms;
-  in {
+  programs.chromium = {
     enable = true;
-    package = if canUseChrome then pkgs.google-chrome else pkgs.chromium;
+    package = if pkgs ? google-chrome then pkgs.google-chrome else pkgs.chromium;
   };
 
   home.packages = [ pkgs.zed-editor ];
@@ -29,10 +22,6 @@ in
   xdg.configFile = {
     "ghostty/config".text = builtins.readFile ./ghostty;
     "zed/settings.json".source = ./zed.json;
-  };
-
-  wayland.windowManager.hyprland = lib.mkIf isLinux {
-    enable = true;
   };
 
 }

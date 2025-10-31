@@ -2,12 +2,8 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 
-let
-  # 24.05+ renamed hardware.opengl → hardware.graphics. Support either.
-  hasGraphics = lib.hasAttr "graphics" config.hardware;
-in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -56,7 +52,7 @@ in
   users.users.maxim = {
     isNormalUser = true;
     description = "maxim";
-    extraGroups = [ "networkmanager" "wheel" "seat" ];
+    extraGroups = [ "networkmanager" "wheel" ];
     shell = pkgs.fish;
     packages = with pkgs; [];
   };
@@ -67,90 +63,39 @@ in
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  ############################################
-  # VMware guest + graphics
-  ############################################
-  virtualisation.vmware.guest.enable = true;     # open-vm-tools, udev rules, etc.
-  services.xserver.videoDrivers = [ "vmware" ];  # loads vmwgfx (DRM/KMS) for Wayland
-
-  # GL stack (pick the right option based on your NixOS release)
-  hardware.graphics = lib.mkIf hasGraphics {
-    enable = true;
-    enable32Bit = true;
-  };
-  hardware.opengl = lib.mkIf (!hasGraphics) {
-    enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
-  };
-
-  ############################################
-  # Hyprland (wlroots Wayland compositor)
-  ############################################
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;   # X apps under Wayland
-  };
-
-  # Optional: log into Hyprland via a display manager (SDDM/Wayland)
-  services.xserver.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
-  services.displayManager.defaultSession = "hyprland";
-
-  ############################################
-  # Portals, audio, auth prompts
-  ############################################
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-hyprland pkgs.xdg-desktop-portal-gtk ];
-    config.common.default = [ "hyprland" "gtk" ];
-  };
-
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-    jack.enable = true;
-    wireplumber.enable = true;
-  };
-
-  security.polkit.enable = true;
-
-  ############################################
-  # Helpful packages
-  ############################################
+  # List packages installed in system profile. To search, run:
+  # $ nix search wget
   environment.systemPackages = with pkgs; [
-    waybar
-    hyprpaper
-    hyprlock
-    rofi-wayland
-    wl-clipboard
-    grim
-    slurp
-    foot
-    hypridle
-    ghostty
-    zed-editor
+  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  #  wget
+    gnome-tweaks
+    gnome-themes-extra
+    gnome-user-share
+    gnomeExtensions.appindicator
     mesa-demos
-    wofi
+    zed-editor
+    ghostty
+
   ];
 
-  ############################################
-  # VMware + wlroots quirks (safe to keep)
-  ############################################
-  environment.variables = {
-    # Fixes invisible/blinky cursor with vmwgfx in some VMware versions
-    WLR_NO_HARDWARE_CURSORS = "1";
+  # Some programs need SUID wrappers, can be configured further or are
+  # started in user sessions.
+  # programs.mtr.enable = true;
+  # programs.gnupg.agent = {
+  #   enable = true;
+  #   enableSSHSupport = true;
+  # };
 
-    # If 3D accel isn't actually available, allow llvmpipe rather than hard-failing
-    WLR_RENDERER_ALLOW_SOFTWARE = "1";
+  # List services that you want to enable:
 
-    # Use systemd-logind for seat management (no separate seatd service needed on NixOS)
-    LIBSEAT_BACKEND = "logind";
+  # Enable the OpenSSH daemon.
+  # services.openssh.enable = true;
 
-    XDG_SESSION_TYPE = "wayland";
-  ];
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  # networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -159,4 +104,27 @@ in
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
+
+  services.xserver.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
+
+
+  services.xserver.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
+  services.xserver.desktopManager.gnome.extraGSettingsOverrides = ''
+    [org.gnome.mutter]
+    experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']
+    [org/gnome/desktop/interface]
+    scaling-factor=1.5
+  '';
+
+  virtualisation.vmware.guest.enable = true;
+
+  programs.fuse.userAllowOther = true;
+  fileSystems."/mnt/hgfs" = {
+    device = ".host:/";
+    fsType = "fuse.vmhgfs-fuse";
+    options = [ "allow_other" "x-systemd.automount" "_netdev" ];
+  };
+
 }
