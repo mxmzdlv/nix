@@ -13,6 +13,7 @@ in
 
   programs.chromium = {
     enable = true;
+    package = if pkgs ? google-chrome then pkgs.google-chrome else pkgs.chromium;
   };
 
   home.packages = [ pkgs.zed-editor ];
