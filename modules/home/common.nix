@@ -12,7 +12,6 @@ in
   } // (if isDarwin then {} else {});
 
   nixpkgs.config.allowUnfree = true;
-  chrome = pkgs.google-chrome;
 
   home.packages = [ pkgs.google-chrome ];
 
