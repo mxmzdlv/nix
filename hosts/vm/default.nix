@@ -75,6 +75,14 @@
     mesa-demos
     zed-editor
     ghostty
+    hypridle
+    hyprlock
+    hyprpaper
+    waybar
+    wl-clipboard
+    grim
+    slurp
+    wofi
 
   ];
 
@@ -108,6 +116,25 @@
   services.xserver.enable = true;
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
+
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal-hyprland
+    ];
+    config = {
+      common = {
+        default = [ "hyprland" "gtk" ];
+      };
+    };
+    gtkUsePortal = true;
+  };
 
 
   services.xserver.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
