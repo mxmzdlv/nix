@@ -29,7 +29,8 @@ in
 
   # Shared application configuration synced into XDG config directory
   xdg.configFile = {
-    "ghostty/config".text = builtins.readFile ./ghostty;
+    "ghostty/config".text =
+      builtins.readFile ./ghostty + "\n" + builtins.readFile ./ghostty-keybinds;
     "zed/settings.json".source = ./zed.json;
   };
 
