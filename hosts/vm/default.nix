@@ -133,7 +133,6 @@
         default = [ "hyprland" "gtk" ];
       };
     };
-    gtkUsePortal = true;
   };
 
 
