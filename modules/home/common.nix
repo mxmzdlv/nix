@@ -11,9 +11,16 @@ in
     LANG = "en_US.UTF-8";
   } // (if isDarwin then {} else {});
 
-  programs.chromium = {
+  programs.chromium = let
+    hostSystem = pkgs.stdenv.hostPlatform.system;
+    chromeMetaPlatforms =
+      if pkgs ? google-chrome
+      then (pkgs.google-chrome.meta.platforms or [])
+      else [];
+    canUseChrome = lib.elem hostSystem chromeMetaPlatforms;
+  in {
     enable = true;
-    package = if pkgs ? google-chrome then pkgs.google-chrome else pkgs.chromium;
+    package = if canUseChrome then pkgs.google-chrome else pkgs.chromium;
   };
 
   home.packages = [ pkgs.zed-editor ];
