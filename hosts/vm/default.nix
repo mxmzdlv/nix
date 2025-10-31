@@ -68,10 +68,6 @@
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
-    gnome-tweaks
-    gnome-themes-extra
-    gnome-user-share
-    gnomeExtensions.appindicator
     mesa-demos
     zed-editor
     ghostty
@@ -119,7 +115,7 @@
     enable = true;
     user = "maxim";
   };
-  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.defaultSession = "hyprland";
   services.xserver.displayManager.sessionPackages = [ pkgs.hyprland ];
 
   programs.hyprland = {
@@ -140,14 +136,6 @@
     };
   };
 
-
-  services.xserver.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
-  services.xserver.desktopManager.gnome.extraGSettingsOverrides = ''
-    [org.gnome.mutter]
-    experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']
-    [org/gnome/desktop/interface]
-    scaling-factor=1.5
-  '';
 
   virtualisation.vmware.guest.enable = true;
 
