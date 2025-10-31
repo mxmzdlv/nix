@@ -24,6 +24,7 @@ in
   };
 
   home.packages = [
+    pkgs.elephant
     pkgs.walker
     pkgs.zed-editor
   ];
