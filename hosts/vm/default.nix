@@ -79,10 +79,6 @@
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
-    gnome-tweaks
-    gnome-themes-extra
-    gnome-user-share
-    gnomeExtensions.appindicator
     mesa-demos
     zed-editor
     ghostty
@@ -116,20 +112,12 @@
   system.stateVersion = "25.11"; # Did you read the comment?
 
   services.xserver.enable = true;
-  services.displayManager.gdm.enable = true;
+  services.displayManager.sddm.enable = true;
   services.displayManager.autoLogin = {
     enable = true;
     user = "maxim";
   };
-  services.desktopManager.gnome.enable = true;
-
-  services.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
-  services.desktopManager.gnome.extraGSettingsOverrides = ''
-    [org.gnome.mutter]
-    experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']
-    [org/gnome/desktop/interface]
-    scaling-factor=1.5
-  '';
+  services.desktopManager.plasma6.enable = true;
 
   virtualisation.vmware.guest.enable = true;
 
