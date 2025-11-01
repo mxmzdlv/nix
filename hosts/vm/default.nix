@@ -111,6 +111,9 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
+  services.greetd.enable = true;
+  services.greetd.settings.default_session.command = "Hyprland";
+
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
