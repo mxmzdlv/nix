@@ -59,7 +59,7 @@ in
       switch-to-application-8 = [];
       switch-to-application-9 = [];
       # Disable overview on bare Super press so it can be remapped by the tiling WM
-      toggle-overview = [ "" ];
+      toggle-overview = [ "XF86Launch5" ];
       toggle-application-view = [ "" ];
     };
   };
