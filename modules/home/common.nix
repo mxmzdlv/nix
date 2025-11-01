@@ -32,7 +32,7 @@ in
     enable = true;
     settings = {
       bind = [
-        "SUPER, RETURN, exec, ghostty"
+        "SUPER_G, exec, ghostty"
       ];
     };
   };
