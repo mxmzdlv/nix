@@ -54,6 +54,8 @@ in
       switch-to-application-7 = [];
       switch-to-application-8 = [];
       switch-to-application-9 = [];
+      # Disable overview on bare Super press so it can be remapped by the tiling WM
+      toggle-overview = [];
     };
 
     # If you run Dash-to-Dock, also kill its Super+number behavior
