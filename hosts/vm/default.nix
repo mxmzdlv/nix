@@ -116,15 +116,15 @@
   system.stateVersion = "25.11"; # Did you read the comment?
 
   services.xserver.enable = true;
-  services.xserver.displayManager.gdm = {
+  services.displayManager.gdm.enable = true;
+  services.displayManager.autoLogin = {
     enable = true;
-    autoLogin.enable = true;
-    autoLogin.user = "maxim";
+    user = "maxim";
   };
-  services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = true;
 
-  services.xserver.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
-  services.xserver.desktopManager.gnome.extraGSettingsOverrides = ''
+  services.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
+  services.desktopManager.gnome.extraGSettingsOverrides = ''
     [org.gnome.mutter]
     experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']
     [org/gnome/desktop/interface]
