@@ -28,25 +28,6 @@ in
   ];
 
   dconf.settings = {
-    "org/gnome/mutter" = {
-      overlay-key = "";
-    };
-
-    # Tiling with Super+Left/Right (GNOME Mutter)
-    "org/gnome/mutter/keybindings" = {
-      toggle-tiled-left = [];
-      toggle-tiled-right = [];
-    };
-
-    # Maximize/unmaximize on Super+Up/Down (GNOME WM)
-    "org/gnome/desktop/wm/keybindings" = {
-      maximize = [];
-      unmaximize = [];
-      # keep a non-super alternative for max/restore
-      toggle-maximized = ["<Alt>F10"];
-      panel-main-menu = [];
-    };
-
     # App switching with Super+1..9 (GNOME Shell)
     "org/gnome/shell/keybindings" = {
       switch-to-application-1 = [];
@@ -60,7 +41,6 @@ in
       switch-to-application-9 = [];
       # Disable overview on bare Super press so it can be remapped by the tiling WM
       toggle-overview = [ "<Super>space" ];
-      toggle-application-view = [ "" ];
     };
   };
 
