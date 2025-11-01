@@ -28,8 +28,6 @@ in
   ];
 
 
-  programs.dconf.enable = true;
-
   dconf.settings = {
     # Tiling with Super+Left/Right (GNOME Mutter)
     "org/gnome/mutter/keybindings" = {

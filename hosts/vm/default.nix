@@ -136,4 +136,7 @@
     options = [ "allow_other" "x-systemd.automount" "_netdev" ];
   };
 
+  programs.dconf.enable = true;
+
+
 }
