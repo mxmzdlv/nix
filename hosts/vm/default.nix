@@ -116,7 +116,11 @@
   system.stateVersion = "25.11"; # Did you read the comment?
 
   services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm = {
+    enable = true;
+    autoLogin.enable = true;
+    autoLogin.user = "maxim";
+  };
   services.xserver.desktopManager.gnome.enable = true;
 
   services.xserver.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
