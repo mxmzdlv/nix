@@ -28,15 +28,6 @@ in
     pkgs.zed-editor
   ];
 
-  wayland.windowManager.hyprland = {
-    enable = true;
-    settings = {
-      bind = [
-        "SUPER, G, exec, ghostty"
-      ];
-    };
-  };
-
   # Shared application configuration synced into XDG config directory
   xdg.configFile = {
     "ghostty/config".text =
