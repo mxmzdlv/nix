@@ -14,6 +14,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -48,6 +49,16 @@
     variant = "";
   };
 
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = false;
+    extraPackages = with pkgs; [
+      mesa
+    ];
+  };
+
+  services.xserver.videoDrivers = [ "virtio" ];
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.maxim = {
     isNormalUser = true;
@@ -75,7 +86,6 @@
     mesa-demos
     zed-editor
     ghostty
-
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -106,12 +116,15 @@
   system.stateVersion = "25.11"; # Did you read the comment?
 
   services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "maxim";
+  };
+  services.desktopManager.gnome.enable = true;
 
-
-  services.xserver.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
-  services.xserver.desktopManager.gnome.extraGSettingsOverrides = ''
+  services.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
+  services.desktopManager.gnome.extraGSettingsOverrides = ''
     [org.gnome.mutter]
     experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']
     [org/gnome/desktop/interface]
@@ -126,5 +139,8 @@
     fsType = "fuse.vmhgfs-fuse";
     options = [ "allow_other" "x-systemd.automount" "_netdev" ];
   };
+
+  programs.dconf.enable = true;
+
 
 }
