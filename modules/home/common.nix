@@ -6,11 +6,6 @@ let
   isLinux  = pkgs.stdenv.isLinux;
 in
 {
-  # Pull in the xremap Home Manager module provided by the flake
-  imports = [
-    inputs.xremap-flake.homeManagerModules.default
-  ];
-
   home.stateVersion = "25.11";
   home.sessionVariables = {
     LANG = "en_US.UTF-8";
@@ -26,31 +21,6 @@ in
   in {
     enable = true;
     package = if canUseChrome then pkgs.google-chrome else pkgs.chromium;
-  };
-
-  services.xremap = {
-    enable = true;
-    serviceMode = "user";   # user session service
-    withGnome = true;       # installs/uses the GNOME helper extension (needed for per-app filters)
-
-    config = {
-      keymap = [
-        {
-          name = "Cmd→Ctrl (except Ghostty)";
-          # Ghostty’s Wayland app-id/class:
-          #   com.mitchellh.ghostty   (and sometimes just "Ghostty")
-          application = { not = [ "com.mitchellh.ghostty" "Ghostty" ]; };
-          remap = {
-            "Super-c" = "C-c";  # Cmd+C → Ctrl+C
-            "Super-v" = "C-v";  # Cmd+V → Ctrl+V
-            "Super-a" = "C-a";  # Cmd+A → Ctrl+A
-            "Super-n" = "C-n";  # Cmd+N → Ctrl+N
-            "Super-q" = "C-q";  # Cmd+Q → Ctrl+Q
-            "Super-x" = "C-x";  # Cmd+X → Ctrl+X
-          };
-        }
-      ];
-    };
   };
 
   home.packages = [

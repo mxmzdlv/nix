@@ -7,12 +7,9 @@
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-     # xremap HM/NixOS modules
-    xremap-flake.url = "github:xremap/nix-flake";
-    xremap-flake.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, xremap-flake, ... }:
+  outputs = { self, nixpkgs, darwin, home-manager, ... }:
   let
     # Adjust these if your arch differs:
     macSystem = "aarch64-darwin";
@@ -21,7 +18,6 @@
     mkHMUser = username: { pkgs, ... }: {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.extraSpecialArgs = { inputs = { inherit xremap-flake; }; };
       home-manager.users.${username} = import ./modules/home/common.nix;
     };
 
