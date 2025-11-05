@@ -133,4 +133,30 @@
   programs.dconf.enable = true;
 
 
+  services.xremap = {
+    enable = true;
+    serviceMode = "user";   # user session service
+    withGnome = true;       # installs/uses the GNOME helper extension (needed for per-app filters)
+
+    config = {
+      keymap = [
+        {
+          name = "Cmd→Ctrl (except Ghostty)";
+          # Ghostty’s Wayland app-id/class:
+          #   com.mitchellh.ghostty   (and sometimes just "Ghostty")
+          application = { not = [ "com.mitchellh.ghostty" "Ghostty" ]; };
+          remap = {
+            "Super-c" = "C-c";  # Cmd+C → Ctrl+C
+            "Super-v" = "C-v";  # Cmd+V → Ctrl+V
+            "Super-a" = "C-a";  # Cmd+A → Ctrl+A
+            "Super-n" = "C-n";  # Cmd+N → Ctrl+N
+            "Super-q" = "C-q";  # Cmd+Q → Ctrl+Q
+            "Super-x" = "C-x";  # Cmd+X → Ctrl+X
+          };
+        }
+      ];
+    };
+  };
+
+
 }
