@@ -51,13 +51,10 @@
 
   hardware.graphics = {
     enable = true;
-    enable32Bit = false;
     extraPackages = with pkgs; [
       mesa
     ];
   };
-
-  services.xserver.videoDrivers = [ "virtio" ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.maxim = {
@@ -132,13 +129,6 @@
   '';
 
   virtualisation.vmware.guest.enable = true;
-
-  programs.fuse.userAllowOther = true;
-  fileSystems."/mnt/hgfs" = {
-    device = ".host:/";
-    fsType = "fuse.vmhgfs-fuse";
-    options = [ "allow_other" "x-systemd.automount" "_netdev" ];
-  };
 
   programs.dconf.enable = true;
 
