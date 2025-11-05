@@ -49,6 +49,8 @@
     variant = "";
   };
 
+
+
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
@@ -119,6 +121,12 @@
     user = "maxim";
   };
   services.desktopManager.gnome.enable = true;
+
+  # Let xremap create a virtual keyboard (needed on Wayland)
+  hardware.uinput.enable = true;
+  services.udev.extraRules = ''
+    KERNEL=="uinput", GROUP="input", TAG+="uaccess"
+  '';
 
   services.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
   services.desktopManager.gnome.extraGSettingsOverrides = ''

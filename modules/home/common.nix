@@ -6,6 +6,11 @@ let
   isLinux  = pkgs.stdenv.isLinux;
 in
 {
+  # Pull in the xremap Home Manager module provided by the flake
+  imports = [
+    inputs.xremap-flake.homeManagerModules.default
+  ];
+
   home.stateVersion = "25.11";
   home.sessionVariables = {
     LANG = "en_US.UTF-8";
