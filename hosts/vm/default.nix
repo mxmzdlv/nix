@@ -113,10 +113,12 @@
   system.stateVersion = "25.11"; # Did you read the comment?
 
   services.xserver.enable = true;
-  services.displayManager.gdm.enable = true;
-  services.displayManager.autoLogin = {
+  services.displayManager.gdm = {
     enable = true;
-    user = "maxim";
+    autoLogin = {
+      enable = true;
+      user = "maxim";
+    };
   };
   services.desktopManager.gnome.enable = true;
 
