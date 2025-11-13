@@ -52,4 +52,6 @@ in
     "zed/settings.json".source = ./zed.json;
   };
 
+  # Ensure ~/code exists so repos/apps have a consistent location
+  home.file."code/.keep".text = "";
 }
