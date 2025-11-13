@@ -111,11 +111,13 @@
 
   services.displayManager.gdm = {
     enable = true;
-    autoLogin = {
-      enable = true;
-      user = "maxim";
-    };
   };
+
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "maxim";
+  };
+
   services.desktopManager.gnome.enable = true;
 
   services.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
