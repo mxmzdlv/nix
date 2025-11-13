@@ -65,9 +65,6 @@
     packages = with pkgs; [];
   };
 
-  # Enable automatic login for the user.
-  services.getty.autologinUser = "maxim";
-
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -112,7 +109,6 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
-  services.xserver.enable = true;
   services.displayManager.gdm = {
     enable = true;
     autoLogin = {
