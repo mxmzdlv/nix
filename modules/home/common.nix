@@ -30,7 +30,7 @@ in
     [
       pkgs.zed-editor
       pkgs.bitwarden
-    ]
+    ];
 
   dconf.settings = {
     # App switching with Super+1..9 (GNOME Shell)
