@@ -22,7 +22,7 @@ in
     enable = true;
     package = if canUseChrome then pkgs.google-chrome else pkgs.chromium;
     extensions = [
-      "nngceckbapebfimnlniiiahkandclblb" // Bitwarden
+      "nngceckbapebfimnlniiiahkandclblb" # Bitwarden
     ];
   };
 
