@@ -28,8 +28,11 @@ in
 
   home.packages =
     [
-      pkgs.zed-editor
       pkgs.bitwarden-desktop
+      pkgs.localsend
+      pkgs.mpv
+      pkgs.zed-editor
+      pkgs.ghostty
     ];
 
   dconf.settings = {

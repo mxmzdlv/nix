@@ -78,8 +78,6 @@
     gnome-user-share
     gnomeExtensions.appindicator
     mesa-demos
-    zed-editor
-    ghostty
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
