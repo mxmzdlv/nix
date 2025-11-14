@@ -29,7 +29,7 @@ in
   home.packages =
     [
       pkgs.zed-editor
-      pkgs.bitwarden
+      pkgs.bitwarden-desktop
     ];
 
   dconf.settings = {
