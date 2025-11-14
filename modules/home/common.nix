@@ -21,11 +21,16 @@ in
   in {
     enable = true;
     package = if canUseChrome then pkgs.google-chrome else pkgs.chromium;
+    extensions = [
+      pkgs.chromiumExtensions.bitwarden
+    ];
   };
 
-  home.packages = [
-    pkgs.zed-editor
-  ];
+  home.packages =
+    [
+      pkgs.zed-editor
+      pkgs.bitwarden
+    ]
 
   dconf.settings = {
     # App switching with Super+1..9 (GNOME Shell)
