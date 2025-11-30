@@ -33,6 +33,8 @@ in
       pkgs.mpv
       pkgs.zed-editor
       pkgs.ghostty
+      pkgs.vscode
+      pkgs.sublime4-dev
     ];
 
   dconf.settings = {
