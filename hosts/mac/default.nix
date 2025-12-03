@@ -8,6 +8,9 @@
   # Allow proprietary tools (needed for some user packages)
   nixpkgs.config.allowUnfree = true;
 
+  # Tell nix-darwin which user owns per-user options (e.g. homebrew)
+  system.primaryUser = "maxim";
+
   # Primary user; home-manager extends this
   users.users.maxim = {
     home = "/Users/maxim";
