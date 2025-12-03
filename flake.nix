@@ -64,12 +64,6 @@
               enableRosetta = true;
               autoMigrate = true;
               user = "maxim";
-              taps = {
-                "homebrew/homebrew-core" = nix-homebrew.inputs.homebrew-core;
-                "homebrew/homebrew-cask" = nix-homebrew.inputs.homebrew-cask;
-                "homebrew/homebrew-bundle" = nix-homebrew.inputs.homebrew-bundle;
-                "homebrew/homebrew-services" = nix-homebrew.inputs.homebrew-services;
-              };
             };
 
             homebrew = {

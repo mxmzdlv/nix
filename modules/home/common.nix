@@ -33,7 +33,6 @@ in
       pkgs.mpv
       pkgs.zed-editor
       pkgs.vscode
-      pkgs.sublime4-dev
     ] ++ lib.optionals (!isDarwin) [ pkgs.ghostty ];
 
   dconf.settings = {
