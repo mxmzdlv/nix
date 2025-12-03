@@ -48,15 +48,15 @@
       };
     };
 
-    # darwinConfigurations = {
-    #   mac = darwin.lib.darwinSystem {
-    #     system = macSystem;
-    #     modules = sharedModules ++ [
-    #       ./hosts/mac
-    #       home-manager.darwinModules.home-manager
-    #       (mkHMUser "maxim")
-    #     ];
-    #   };
-    # };
+    darwinConfigurations = {
+      mac = darwin.lib.darwinSystem {
+        system = macSystem;
+        modules = sharedModules ++ [
+          ./hosts/mac
+          home-manager.darwinModules.home-manager
+          (mkHMUser "maxim")
+        ];
+      };
+    };
   };
 }
