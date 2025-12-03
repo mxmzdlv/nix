@@ -68,7 +68,14 @@
 
             homebrew = {
               enable = true;
-              casks = [ "ghostty" ];
+              casks = [
+                "bitwarden"
+                "ghostty"
+                "localsend"
+                "mpv"
+                "visual-studio-code"
+                "zed"
+              ];
             };
           }
         ];

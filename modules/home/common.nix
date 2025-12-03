@@ -26,14 +26,14 @@ in
     ];
   };
 
-  home.packages =
-    [
-      pkgs.bitwarden-desktop
-      pkgs.localsend
-      pkgs.mpv
-      pkgs.zed-editor
-      pkgs.vscode
-    ] ++ lib.optionals (!isDarwin) [ pkgs.ghostty ];
+  home.packages = lib.optionals (!isDarwin) [
+    pkgs.bitwarden-desktop
+    pkgs.localsend
+    pkgs.mpv
+    pkgs.zed-editor
+    pkgs.vscode
+    pkgs.ghostty
+  ];
 
   dconf.settings = {
     # App switching with Super+1..9 (GNOME Shell)
