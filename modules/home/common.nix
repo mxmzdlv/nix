@@ -32,10 +32,9 @@ in
       pkgs.localsend
       pkgs.mpv
       pkgs.zed-editor
-      pkgs.ghostty
       pkgs.vscode
       pkgs.sublime4-dev
-    ];
+    ] ++ lib.optionals (!isDarwin) [ pkgs.ghostty ];
 
   dconf.settings = {
     # App switching with Super+1..9 (GNOME Shell)
