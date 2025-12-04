@@ -39,6 +39,32 @@ let
 
       git add -A; and git commit -m "$msg"
     '';
+    gas = ''
+      git add -A; or return $status
+
+      set diff (git diff --cached --ignore-submodules -- | string collect)
+      if test -z "$diff"
+        echo "gas: nothing to commit" >&2
+        return 0
+      end
+
+      set llm_bin (string trim -- (set -q GIT_LLM_BIN; and echo $GIT_LLM_BIN; or echo "ollama"))
+      set llm_model (string trim -- (set -q GIT_LLM_MODEL; and echo $GIT_LLM_MODEL; or echo "gemma3:12b"))
+      set msg ""
+
+      if type -q $llm_bin
+        set request (printf "Summarize the git diff into a descriptive commit message explaining what changed. Only output the commit message.\n\n%s" "$diff")
+        set msg ($llm_bin run $llm_model $request 2>/dev/null | head -n 1 | string trim)
+      else
+        echo "gas: LLM command not found: $llm_bin" >&2
+      end
+
+      if test -z "$msg"
+        set msg (printf "Auto-commit %s" (date -u +"%Y-%m-%dT%H:%M:%SZ"))
+      end
+
+      git commit -m "$msg"
+    '';
     copy = ''
       function copy
           if test (count $argv) -gt 0
