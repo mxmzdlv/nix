@@ -73,7 +73,7 @@ let
     NOTES_DIR="$HOME/notes"
     # Optional overrides for the local LLM binary/model to summarize diffs (defaults to Ollama).
     NOTES_LLM_BIN="''${NOTES_LLM_BIN:-ollama}"
-    NOTES_LLM_MODEL="''${NOTES_LLM_MODEL:-gemma3:4b}"
+    NOTES_LLM_MODEL="''${NOTES_LLM_MODEL:-gemma3:12b}"
     mkdir -p "$NOTES_DIR"
     cd "$NOTES_DIR"
 
@@ -116,9 +116,7 @@ let
       fi
 
       if command -v "$NOTES_LLM_BIN" >/dev/null 2>&1; then
-        echo "notes-git-watch: LLM command '$NOTES_LLM_BIN' run \"$NOTES_LLM_MODEL\"" >&2
-        request=$(printf "Summarize the git diff into a short imperative commit message (max 12 words). Only output the commit message.\n\n%s" "$diff")
-        printf "notes-git-watch: LLM request:\n%s\n" "$request" >&2
+        request=$(printf "Summarize the git diff into a descriptive commit message explaining what changed. Only talk about changes (diff plus and minus signs). This is a log of todo, notes, and other tasks. So your message should reflect what has changed in the notes. Only output the commit message.\n\n%s" "$diff")
         msg=$("$NOTES_LLM_BIN" run "$NOTES_LLM_MODEL" "$request" 2>/dev/null || true)
         llm_status=$?
         msg=$(echo "$msg" | head -n 1 | sed 's/^\\s*//;s/\\s*$//')
