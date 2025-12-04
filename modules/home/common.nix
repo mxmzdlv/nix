@@ -8,10 +8,13 @@ let
     #!${pkgs.bash}/bin/bash
     set -euo pipefail
 
-    export PATH="${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnutar pkgs.gawk pkgs.bash ]}:$PATH"
+    export PATH="${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnutar pkgs.gawk pkgs.bash pkgs.gnused ]}:$PATH"
 
     REMOTE_URL="git@github.com:mxmzdlv/notes.git"
     NOTES_DIR="$HOME/notes"
+    # Optional overrides for the Apple LLM binary/model to summarize diffs.
+    NOTES_LLM_BIN="${NOTES_LLM_BIN:-ai}"
+    NOTES_LLM_MODEL="${NOTES_LLM_MODEL:-local}"
     mkdir -p "$NOTES_DIR"
     cd "$NOTES_DIR"
 
@@ -44,6 +47,26 @@ let
       git push -u origin "$branch" || true
     }
 
+    generate_commit_message() {
+      local diff msg
+      diff=$(git diff --cached)
+      if [ -z "$diff" ]; then
+        echo "Auto-save $(date -Iseconds)"
+        return
+      fi
+
+      if command -v "$NOTES_LLM_BIN" >/dev/null 2>&1; then
+        msg=$(printf "Summarize the git diff into a short imperative commit message (max 12 words). Only output the commit message.\n\n%s" "$diff" | "$NOTES_LLM_BIN" --model "$NOTES_LLM_MODEL" --temperature 0.2 2>/dev/null || true)
+        msg=$(echo "$msg" | head -n 1 | sed 's/^\\s*//;s/\\s*$//')
+        if [ -n "$msg" ]; then
+          echo "$msg"
+          return
+        fi
+      fi
+
+      echo "Auto-save $(date -Iseconds)"
+    }
+
     ensure_repo
 
     pull_timer=0
@@ -56,7 +79,8 @@ let
       fi
       git add -A
       if ! git diff --cached --quiet --ignore-submodules --; then
-        git commit -m "Auto-save $(date -Iseconds)" || true
+        commit_message=$(generate_commit_message)
+        git commit -m "$commit_message" || true
         push_remote
       fi
       sleep 10
