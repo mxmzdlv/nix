@@ -108,8 +108,9 @@ let
 
     generate_commit_message() {
       local diff msg
-      diff=$(git diff -- ":(exclude)assets/*" --cached)
+      diff=$(git diff --cached -- . ":(exclude)assets/*")
       if [ -z "$diff" ]; then
+        echo "notes-git-watch: no staged diff after filtering assets; using timestamp" >&2
         echo "Auto-save $(date -Iseconds)"
         return
       fi
