@@ -158,6 +158,12 @@ in
     LANG = "en_US.UTF-8";
   } // (if isDarwin then {} else {});
 
+  home.sessionPath = lib.optionals isDarwin [
+    "/opt/homebrew/bin"
+    "/opt/homebrew/sbin"
+  ];
+
+
   programs.chromium = let
     hostSystem = pkgs.stdenv.hostPlatform.system;
     chromeMetaPlatforms =
