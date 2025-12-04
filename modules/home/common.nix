@@ -53,8 +53,9 @@ let
       set msg ""
 
       if type -q $llm_bin
-        set request (printf "Summarize the git diff into a descriptive commit message explaining what changed. Only output the commit message.\n\n%s" "$diff")
-        set msg ($llm_bin run $llm_model $request 2>/dev/null | head -n 1 | string trim)
+        set request "Summarize the git diff into a descriptive commit message explaining what changed. Only output the commit message.\n\n$diff"
+        set msg_raw ($llm_bin run $llm_model $request 2>/dev/null)
+        set msg (printf "%s\n" $msg_raw | string trim | string match -r ".+" | head -n 1)
       else
         echo "gas: LLM command not found: $llm_bin" >&2
       end
