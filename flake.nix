@@ -66,8 +66,18 @@
               user = "maxim";
             };
 
+
             homebrew = {
               enable = true;
+
+              taps = [
+                "oven-sh/bun"
+              ];
+
+              brews = [
+                "oven-sh/bun/bun"
+              ];
+
               casks = [
                 "bitwarden"
                 "ghostty"
