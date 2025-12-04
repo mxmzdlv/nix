@@ -16,14 +16,14 @@ let
     cd "$NOTES_DIR"
 
     current_branch() {
-      git symbolic-ref --short HEAD 2>/dev/null || echo main
+      git symbolic-ref --short HEAD 2>/dev/null || echo master
     }
 
     ensure_repo() {
       if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         git init
       fi
-      git symbolic-ref HEAD refs/heads/main 2>/dev/null || true
+      git symbolic-ref HEAD refs/heads/master 2>/dev/null || true
       if git remote get-url origin >/dev/null 2>&1; then
         git remote set-url origin "$REMOTE_URL"
       else
