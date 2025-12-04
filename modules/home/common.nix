@@ -10,23 +10,54 @@ let
 
     export PATH="${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnutar pkgs.gawk pkgs.bash ]}:$PATH"
 
+    REMOTE_URL="git@github.com:mxmzdlv/notes.git"
     NOTES_DIR="$HOME/notes"
     mkdir -p "$NOTES_DIR"
     cd "$NOTES_DIR"
+
+    current_branch() {
+      git symbolic-ref --short HEAD 2>/dev/null || echo main
+    }
 
     ensure_repo() {
       if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         git init
       fi
+      git symbolic-ref HEAD refs/heads/main 2>/dev/null || true
+      if git remote get-url origin >/dev/null 2>&1; then
+        git remote set-url origin "$REMOTE_URL"
+      else
+        git remote add origin "$REMOTE_URL"
+      fi
+    }
+
+    pull_remote() {
+      local branch="$(current_branch)"
+      git fetch origin >/dev/null 2>&1 || return
+      if git rev-parse --verify "origin/$branch" >/dev/null 2>&1; then
+        git pull --rebase --autostash origin "$branch" || true
+      fi
+    }
+
+    push_remote() {
+      local branch="$(current_branch)"
+      git push -u origin "$branch" || true
     }
 
     ensure_repo
 
+    pull_timer=0
     while true; do
       ensure_repo
+      pull_timer=$((pull_timer + 10))
+      if [ "$pull_timer" -ge 30 ]; then
+        pull_remote
+        pull_timer=0
+      fi
       git add -A
       if ! git diff --cached --quiet --ignore-submodules --; then
         git commit -m "Auto-save $(date -Iseconds)" || true
+        push_remote
       fi
       sleep 10
     done
@@ -81,11 +112,14 @@ in
 
 
   # Shared application configuration synced into XDG config directory
-  xdg.configFile = {
-    "ghostty/config".text =
-      builtins.readFile ./ghostty + "\n" + builtins.readFile ./ghostty-keybinds;
-    "zed/settings.json".source = ./zed.json;
-  };
+  xdg.configFile =
+    lib.optionalAttrs isLinux {
+      "ghostty/config".text =
+        builtins.readFile ./ghostty + "\n" + builtins.readFile ./ghostty-keybinds;
+    }
+    // {
+      "zed/settings.json".source = ./zed.json;
+    };
 
   # Auto-commit changes in ~/notes every 10 seconds on macOS
   launchd.agents.notes-git-watch = lib.mkIf isDarwin {
