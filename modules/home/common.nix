@@ -160,7 +160,7 @@ let
       if [ "$last_remote_alert" -ne 0 ] && [ $((now - last_remote_alert)) -lt "$REMOTE_HEALTH_THRESHOLD_SECONDS" ]; then
         return
       fi
-      echo "notes-git-watch: no successful remote sync for ${stale_seconds}s (threshold ${REMOTE_HEALTH_THRESHOLD_SECONDS}s)" >&2
+      echo "notes-git-watch: no successful remote sync for ''${stale_seconds}s (threshold ''${REMOTE_HEALTH_THRESHOLD_SECONDS}s)" >&2
       if [ "$(uname -s)" = "Darwin" ] && command -v osascript >/dev/null 2>&1; then
         osascript -e "display notification \"No remote sync for over $((REMOTE_HEALTH_THRESHOLD_SECONDS / 60)) minutes\" with title \"notes-git-watch\"" || true
       fi
