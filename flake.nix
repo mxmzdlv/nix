@@ -73,6 +73,7 @@
                 "ghostty"
                 "localsend"
                 "mpv"
+                "ollama"
                 "visual-studio-code"
                 "zed"
               ];

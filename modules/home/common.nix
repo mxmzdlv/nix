@@ -12,9 +12,9 @@ let
 
     REMOTE_URL="git@github.com:mxmzdlv/notes.git"
     NOTES_DIR="$HOME/notes"
-    # Optional overrides for the Apple LLM binary/model to summarize diffs.
-    NOTES_LLM_BIN="${NOTES_LLM_BIN:-ai}"
-    NOTES_LLM_MODEL="${NOTES_LLM_MODEL:-local}"
+    # Optional overrides for the local LLM binary/model to summarize diffs (defaults to Ollama).
+    NOTES_LLM_BIN="''${NOTES_LLM_BIN:-ollama}"
+    NOTES_LLM_MODEL="''${NOTES_LLM_MODEL:-gemma3:4b}"
     mkdir -p "$NOTES_DIR"
     cd "$NOTES_DIR"
 
@@ -56,7 +56,7 @@ let
       fi
 
       if command -v "$NOTES_LLM_BIN" >/dev/null 2>&1; then
-        msg=$(printf "Summarize the git diff into a short imperative commit message (max 12 words). Only output the commit message.\n\n%s" "$diff" | "$NOTES_LLM_BIN" --model "$NOTES_LLM_MODEL" --temperature 0.2 2>/dev/null || true)
+        msg=$("$NOTES_LLM_BIN" run "$NOTES_LLM_MODEL" "Summarize the git diff into a short imperative commit message (max 12 words). Only output the commit message.\n\n$diff" 2>/dev/null || true)
         msg=$(echo "$msg" | head -n 1 | sed 's/^\\s*//;s/\\s*$//')
         if [ -n "$msg" ]; then
           echo "$msg"
