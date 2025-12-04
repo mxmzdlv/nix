@@ -17,6 +17,9 @@
     shell = pkgs.fish;
   };
 
+  # Use Determinate-managed Nix instead of nix-darwin's built-in management
+  nix.enable = false;
+
   # Required by nix-darwin; update only after reviewing release notes
   system.stateVersion = 6;
 }
