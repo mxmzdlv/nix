@@ -4,11 +4,70 @@
 let
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux  = pkgs.stdenv.isLinux;
+  # Shared git aliases used across shells
+  gitAliases = {
+    g = "git";
+    ga = "git add";
+    gb = "git branch";
+    gcb = "git checkout -b";
+    gcl = "git clone";
+    gco = "git checkout";
+    gd = "git diff";
+    gf = "git fetch";
+    gl = "git log --oneline --graph --decorate";
+    gm = "git merge";
+    gp = "git push";
+    gpl = "git pull";
+    gr = "git rebase";
+    gs = "git status";
+  };
+  fishGitFunctions = {
+    gc = ''
+      if test (count $argv) -eq 0
+        echo "usage: gc \"message\"" >&2
+        return 1
+      end
+
+      set msg (string join " " $argv)
+      git commit -m "$msg"
+    '';
+    gac = ''
+      set msg "-"
+      if test (count $argv) -gt 0
+        set msg (string join " " $argv)
+      end
+
+      git add -A; and git commit -m "$msg"
+    '';
+    copy = ''
+      function copy
+          if test (count $argv) -gt 0
+              set dir $argv[1]
+          else
+              set dir .
+          end
+
+          find $dir \
+              \( -name .git -o -name _build -o -name .zig_cache -o -name zig-out \) -prune -o \
+              -type f \
+              ! -iname '*.db*' \
+              ! -iname '*.parquet*' \
+              ! -name '.*' \
+              -print0 \
+              | xargs -0 awk '
+                  FNR == 1 { printf("==> %s <==\n", FILENAME) }
+                  { print }
+              ' \
+              | pbcopy
+      end
+    '';
+  };
   notesGitWatch = pkgs.writeShellScript "notes-git-watch" ''
     #!${pkgs.bash}/bin/bash
     set -euo pipefail
 
-    export PATH="${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnutar pkgs.gawk pkgs.bash pkgs.gnused ]}:$PATH"
+    # Include Homebrew/default macOS bins so launchd can find Ollama when run headless.
+    export PATH="${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnutar pkgs.gawk pkgs.bash pkgs.gnused ]}:/usr/local/bin:/opt/homebrew/bin:$PATH"
 
     REMOTE_URL="git@github.com:mxmzdlv/notes.git"
     NOTES_DIR="$HOME/notes"
@@ -49,7 +108,7 @@ let
 
     generate_commit_message() {
       local diff msg
-      diff=$(git diff --cached)
+      diff=$(git diff -- ":(exclude)assets/*" --cached)
       if [ -z "$diff" ]; then
         echo "Auto-save $(date -Iseconds)"
         return
@@ -164,4 +223,14 @@ in
 
   # Ensure ~/code exists so repos/apps have a consistent location
   home.file."code/.keep".text = "";
+
+  programs.fish = {
+    enable = true;
+    shellAliases = gitAliases;
+    functions = fishGitFunctions // {
+      n = ''
+        zed ~/notes
+      '';
+    };
+  };
 }
