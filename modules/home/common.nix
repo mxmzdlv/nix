@@ -117,7 +117,9 @@ let
 
       if command -v "$NOTES_LLM_BIN" >/dev/null 2>&1; then
         echo "notes-git-watch: LLM command '$NOTES_LLM_BIN' run \"$NOTES_LLM_MODEL\"" >&2
-        msg=$("$NOTES_LLM_BIN" run "$NOTES_LLM_MODEL" "Summarize the git diff into a short imperative commit message (max 12 words). Only output the commit message.\n\n$diff" 2>/dev/null || true)
+        request=$(printf "Summarize the git diff into a short imperative commit message (max 12 words). Only output the commit message.\n\n%s" "$diff")
+        printf "notes-git-watch: LLM request:\n%s\n" "$request" >&2
+        msg=$("$NOTES_LLM_BIN" run "$NOTES_LLM_MODEL" "$request" 2>/dev/null || true)
         llm_status=$?
         msg=$(echo "$msg" | head -n 1 | sed 's/^\\s*//;s/\\s*$//')
         echo "notes-git-watch: LLM exit=$llm_status msg_len=$(printf \"%s\" \"$msg\" | wc -c)" >&2
