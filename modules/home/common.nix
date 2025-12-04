@@ -4,6 +4,33 @@
 let
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux  = pkgs.stdenv.isLinux;
+  notesGitWatch = pkgs.writeShellScript "notes-git-watch" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
+
+    export PATH="${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnutar pkgs.gawk pkgs.bash ]}:$PATH"
+
+    NOTES_DIR="$HOME/notes"
+    mkdir -p "$NOTES_DIR"
+    cd "$NOTES_DIR"
+
+    ensure_repo() {
+      if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        git init
+      fi
+    }
+
+    ensure_repo
+
+    while true; do
+      ensure_repo
+      git add -A
+      if ! git diff --cached --quiet --ignore-submodules --; then
+        git commit -m "Auto-save $(date -Iseconds)" || true
+      fi
+      sleep 10
+    done
+  '';
 in
 {
   home.stateVersion = "25.11";
@@ -58,6 +85,18 @@ in
     "ghostty/config".text =
       builtins.readFile ./ghostty + "\n" + builtins.readFile ./ghostty-keybinds;
     "zed/settings.json".source = ./zed.json;
+  };
+
+  # Auto-commit changes in ~/notes every 10 seconds on macOS
+  launchd.agents.notes-git-watch = lib.mkIf isDarwin {
+    enable = true;
+    config = {
+      ProgramArguments = [ "${notesGitWatch}" ];
+      KeepAlive = true;
+      RunAtLoad = true;
+      StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/notes-git-watch.err.log";
+      StandardOutPath = "${config.home.homeDirectory}/Library/Logs/notes-git-watch.out.log";
+    };
   };
 
   # Ensure ~/code exists so repos/apps have a consistent location
