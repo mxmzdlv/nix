@@ -86,6 +86,7 @@
                 "ollama"
                 "visual-studio-code"
                 "zed"
+                "codex"
               ];
             };
           }

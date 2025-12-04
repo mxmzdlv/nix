@@ -68,12 +68,18 @@ let
 
     # Include Homebrew/default macOS bins so launchd can find Ollama when run headless.
     export PATH="${lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnutar pkgs.gawk pkgs.bash pkgs.gnused ]}:/usr/local/bin:/opt/homebrew/bin:$PATH"
+    # Fail fast on auth prompts so the launchd job never hangs silently.
+    export GIT_SSH_COMMAND="''${GIT_SSH_COMMAND:-ssh -o BatchMode=yes -o ConnectTimeout=10}"
+    export GIT_TERMINAL_PROMPT=0
 
     REMOTE_URL="git@github.com:mxmzdlv/notes.git"
     NOTES_DIR="$HOME/notes"
     # Optional overrides for the local LLM binary/model to summarize diffs (defaults to Ollama).
     NOTES_LLM_BIN="''${NOTES_LLM_BIN:-ollama}"
     NOTES_LLM_MODEL="''${NOTES_LLM_MODEL:-gemma3:12b}"
+    REMOTE_HEALTH_THRESHOLD_SECONDS=300
+    last_remote_sync=$(date +%s)
+    last_remote_alert=0
     mkdir -p "$NOTES_DIR"
     cd "$NOTES_DIR"
 
@@ -95,15 +101,27 @@ let
 
     pull_remote() {
       local branch="$(current_branch)"
-      git fetch origin >/dev/null 2>&1 || return
+      if ! git fetch origin >/dev/null 2>&1; then
+        echo "notes-git-watch: git fetch origin failed; will retry" >&2
+        return
+      fi
+      last_remote_sync=$(date +%s)
       if git rev-parse --verify "origin/$branch" >/dev/null 2>&1; then
-        git pull --rebase --autostash origin "$branch" || true
+        if ! git pull --rebase --autostash origin "$branch"; then
+          echo "notes-git-watch: git pull --rebase failed for $branch; continuing" >&2
+        else
+          last_remote_sync=$(date +%s)
+        fi
       fi
     }
 
     push_remote() {
       local branch="$(current_branch)"
-      git push -u origin "$branch" || true
+      if ! git push -u origin "$branch"; then
+        echo "notes-git-watch: git push failed for $branch; leaving commits local" >&2
+      else
+        last_remote_sync=$(date +%s)
+      fi
     }
 
     generate_commit_message() {
@@ -132,6 +150,23 @@ let
       echo "Auto-save $(date -Iseconds)"
     }
 
+    notify_stale_sync() {
+      local now stale_seconds
+      now=$(date +%s)
+      stale_seconds=$((now - last_remote_sync))
+      if [ "$stale_seconds" -lt "$REMOTE_HEALTH_THRESHOLD_SECONDS" ]; then
+        return
+      fi
+      if [ "$last_remote_alert" -ne 0 ] && [ $((now - last_remote_alert)) -lt "$REMOTE_HEALTH_THRESHOLD_SECONDS" ]; then
+        return
+      fi
+      echo "notes-git-watch: no successful remote sync for ${stale_seconds}s (threshold ${REMOTE_HEALTH_THRESHOLD_SECONDS}s)" >&2
+      if [ "$(uname -s)" = "Darwin" ] && command -v osascript >/dev/null 2>&1; then
+        osascript -e "display notification \"No remote sync for over $((REMOTE_HEALTH_THRESHOLD_SECONDS / 60)) minutes\" with title \"notes-git-watch\"" || true
+      fi
+      last_remote_alert=$now
+    }
+
     ensure_repo
 
     pull_timer=0
@@ -148,6 +183,7 @@ let
         git commit -m "$commit_message" || true
         push_remote
       fi
+      notify_stale_sync
       sleep 10
     done
   '';
