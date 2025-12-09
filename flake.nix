@@ -76,6 +76,8 @@
 
               brews = [
                 "oven-sh/bun/bun"
+                "dune"
+                "sqlite"
               ];
 
               casks = [
@@ -87,6 +89,7 @@
                 "visual-studio-code"
                 "zed"
                 "codex"
+                "claude-code"
               ];
             };
           }
