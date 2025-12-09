@@ -303,5 +303,10 @@ in
         zed ~/notes
       '';
     };
+    interactiveShellInit = ''
+      if type -q opam
+        eval (opam env --shell=fish)
+      end
+    '';
   };
 }
