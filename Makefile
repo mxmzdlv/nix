@@ -7,8 +7,8 @@ HOST ?= mac
 
 # Darwin vs Linux switch command
 ifeq ($(HOST),mac)
-  SWITCH = darwin-rebuild switch --flake .#$(HOST)
-  BUILD  = darwin-rebuild build --flake .#$(HOST)
+  SWITCH = sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake .#mac
+  BUILD  = sudo nix run nix-darwin/master#darwin-rebuild -- build --flake .#mac
 else
   SWITCH = sudo nixos-rebuild switch --flake .#$(HOST)
   BUILD  = sudo nixos-rebuild build --flake .#$(HOST)
