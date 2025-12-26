@@ -14,6 +14,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -48,6 +49,13 @@
     variant = "";
   };
 
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      mesa
+    ];
+  };
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.maxim = {
     isNormalUser = true;
@@ -56,9 +64,6 @@
     shell = pkgs.fish;
     packages = with pkgs; [];
   };
-
-  # Enable automatic login for the user.
-  services.getty.autologinUser = "maxim";
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -73,9 +78,6 @@
     gnome-user-share
     gnomeExtensions.appindicator
     mesa-demos
-    zed-editor
-    ghostty
-
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -105,13 +107,19 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
-  services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager.gdm = {
+    enable = true;
+  };
 
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "maxim";
+  };
 
-  services.xserver.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
-  services.xserver.desktopManager.gnome.extraGSettingsOverrides = ''
+  services.desktopManager.gnome.enable = true;
+
+  services.desktopManager.gnome.extraGSettingsOverridePackages = [ pkgs.mutter ];
+  services.desktopManager.gnome.extraGSettingsOverrides = ''
     [org.gnome.mutter]
     experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']
     [org/gnome/desktop/interface]
@@ -120,11 +128,29 @@
 
   virtualisation.vmware.guest.enable = true;
 
-  programs.fuse.userAllowOther = true;
-  fileSystems."/mnt/hgfs" = {
-    device = ".host:/";
-    fsType = "fuse.vmhgfs-fuse";
-    options = [ "allow_other" "x-systemd.automount" "_netdev" ];
+  programs.dconf.enable = true;
+
+  services.keyd = {
+    enable = true;
+    keyboards.default = {
+      ids = [ "*" ];
+      settings = {
+        # Map Super+letter to Ctrl+letter globally (affects all apps)
+        main = { super = "layer(meta)"; };
+        meta = {
+          c = "C-c";
+          v = "C-v";
+          a = "C-a";
+          n = "C-n";
+          q = "C-q";
+          x = "C-x";
+          t = "C-t";
+          w = "C-w";
+          z = "C-z";
+        };
+      };
+    };
   };
+
 
 }
