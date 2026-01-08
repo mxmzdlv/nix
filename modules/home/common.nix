@@ -224,6 +224,7 @@ in
   home.sessionPath = lib.optionals isDarwin [
     "/opt/homebrew/bin"
     "/opt/homebrew/sbin"
+    "${config.home.homeDirectory}/go/bin"
   ];
 
 
