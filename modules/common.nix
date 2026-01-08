@@ -23,6 +23,7 @@
     unzip
     bat
     zoxide
+    tmux
   ];
 
   programs.zsh.enable = true;
