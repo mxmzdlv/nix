@@ -20,7 +20,7 @@ let
     gpl = "git pull";
     gr = "git rebase";
     gs = "git status";
-    zg = "lazygit";
+    lz = "lazygit";
   };
   fishGitFunctions = {
     gc = ''
@@ -307,17 +307,20 @@ in
       # Splitting panes with | and -
       bind | split-window -h
       bind - split-window -v
+
+      # Enable window titles
+      set -g set-titles on
+      set -g set-titles-string "#S: #W"
+
+      # Enable pane titles
+      set -g pane-border-status top
+      set -g pane-border-format " #P: #T "
     '';
   };
 
   programs.zsh = {
     enable = true;
     shellAliases = gitAliases;
-    initExtra = ''
-      if [[ -z "$TMUX" && -n "$PS1" ]]; then
-        exec tmux
-      fi
-    '';
   };
 
   programs.fish = {
@@ -336,11 +339,6 @@ in
     interactiveShellInit = ''
       if type -q opam
         eval (opam env --shell=fish)
-      end
-
-      if status is-interactive
-         and not set -q TMUX
-         exec tmux
       end
     '';
   };
