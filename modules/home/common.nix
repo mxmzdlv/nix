@@ -338,7 +338,7 @@ in
     };
     interactiveShellInit = ''
       if type -q opam
-        eval (opam env --shell=fish)
+        eval (opam env --switch=default --shell=fish)
       end
     '';
   };
