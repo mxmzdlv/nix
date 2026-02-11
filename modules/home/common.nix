@@ -330,6 +330,9 @@ in
       n = ''
         zed ~/notes
       '';
+      claude-b = ''
+        CLAUDE_CONFIG_DIR=~/.claude-b claude $argv
+      '';
       develop = ''
         function develop --wraps='nix develop'
           env ANY_NIX_SHELL_PKGS=(basename (pwd))"#"(git describe --tags --dirty) (type -P nix) develop --command fish
