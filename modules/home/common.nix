@@ -223,6 +223,7 @@ in
   } // (if isDarwin then {} else {});
 
   home.sessionPath = lib.optionals isDarwin [
+    "${config.home.homeDirectory}/.local/bin"
     "/opt/homebrew/bin"
     "/opt/homebrew/sbin"
     "${config.home.homeDirectory}/go/bin"
