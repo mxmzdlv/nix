@@ -4,6 +4,9 @@
 let
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux  = pkgs.stdenv.isLinux;
+  repoDir = "${config.home.homeDirectory}/code/nix";
+  outOfStoreConfig = path:
+    config.lib.file.mkOutOfStoreSymlink "${repoDir}/${path}";
   # Shared git aliases used across shells
   gitAliases = {
     g = "git";
@@ -280,7 +283,11 @@ in
         builtins.readFile ./ghostty + "\n" + builtins.readFile ./ghostty-keybinds;
     }
     // {
-      "zed/settings.json".source = ./zed.json;
+      # Link the macOS Zed settings to this checkout so edits apply without rebuilding.
+      "zed/settings.json".source =
+        if isDarwin
+        then outOfStoreConfig "modules/home/zed.json"
+        else ./zed.json;
     };
 
   # Auto-commit changes in ~/notes every 10 seconds on macOS
