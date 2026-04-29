@@ -7,9 +7,11 @@
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    nix-homebrew.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, ... }:
+  outputs = { self, nixpkgs, darwin, home-manager, nix-homebrew, ... }:
   let
     # Adjust these if your arch differs:
     macSystem = "aarch64-darwin";
@@ -18,6 +20,7 @@
     mkHMUser = username: { pkgs, ... }: {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
+      home-manager.backupFileExtension = "backup";
       home-manager.users.${username} = import ./modules/home/common.nix;
     };
 
@@ -48,15 +51,51 @@
       };
     };
 
-    # darwinConfigurations = {
-    #   mac = darwin.lib.darwinSystem {
-    #     system = macSystem;
-    #     modules = sharedModules ++ [
-    #       ./hosts/mac
-    #       home-manager.darwinModules.home-manager
-    #       (mkHMUser "maxim")
-    #     ];
-    #   };
-    # };
+    darwinConfigurations = {
+      mac = darwin.lib.darwinSystem {
+        system = macSystem;
+        modules = sharedModules ++ [
+          nix-homebrew.darwinModules.nix-homebrew
+          ./hosts/mac
+          home-manager.darwinModules.home-manager
+          (mkHMUser "maxim")
+          {
+            nix-homebrew = {
+              enable = true;
+              enableRosetta = true;
+              autoMigrate = true;
+              user = "maxim";
+            };
+
+
+            homebrew = {
+              enable = true;
+
+              taps = [
+                "oven-sh/bun"
+              ];
+
+              brews = [
+                "oven-sh/bun/bun"
+                "dune"
+                "sqlite"
+              ];
+
+              casks = [
+                "bitwarden"
+                "ghostty"
+                "localsend"
+                "mpv"
+                "ollama"
+                "visual-studio-code"
+                "zed"
+                "codex"
+                "claude-code"
+              ];
+            };
+          }
+        ];
+      };
+    };
   };
 }

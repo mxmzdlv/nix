@@ -11,15 +11,19 @@
   # Cross-platform packages (keep it conservative here)
   environment.systemPackages = with pkgs; [
     git
-    # gnupg
-    # curl
-    # wget
-    # vim
-    # htop
-    # ripgrep
-    # fd
-    # jq
-    # unzip
+    xh
+    curl
+    fastfetch
+    lazygit
+    btop
+    eza
+    ripgrep
+    fd
+    jq
+    unzip
+    bat
+    zoxide
+    tmux
   ];
 
   programs.zsh.enable = true;
