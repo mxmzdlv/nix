@@ -5,15 +5,14 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -60,9 +59,12 @@
   users.users.maxim = {
     isNormalUser = true;
     description = "maxim";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     shell = pkgs.fish;
-    packages = with pkgs; [];
+    packages = with pkgs; [ ];
   };
 
   # Allow unfree packages
@@ -71,8 +73,8 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  wget
     gnome-tweaks
     gnome-themes-extra
     gnome-user-share
@@ -136,7 +138,9 @@
       ids = [ "*" ];
       settings = {
         # Map Super+letter to Ctrl+letter globally (affects all apps)
-        main = { super = "layer(meta)"; };
+        main = {
+          super = "layer(meta)";
+        };
         meta = {
           c = "C-c";
           v = "C-v";
@@ -151,6 +155,5 @@
       };
     };
   };
-
 
 }

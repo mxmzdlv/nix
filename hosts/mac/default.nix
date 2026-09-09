@@ -1,8 +1,7 @@
 { pkgs, ... }:
 
 {
-  # Basic host identity
-  networking.hostName = "mac";
+  # Shared settings for both Macs; flake.nix supplies each hostname.
   nixpkgs.hostPlatform = "aarch64-darwin";
 
   # Allow proprietary tools (needed for some user packages)
