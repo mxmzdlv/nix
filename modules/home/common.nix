@@ -6,8 +6,8 @@
 }:
 
 let
-  isDarwin = pkgs.stdenv.isDarwin;
-  isLinux = pkgs.stdenv.isLinux;
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
+  isLinux = pkgs.stdenv.hostPlatform.isLinux;
   repoDir = "${config.home.homeDirectory}/code/nix";
   outOfStoreConfig = path: config.lib.file.mkOutOfStoreSymlink "${repoDir}/${path}";
   # Shared git aliases used across shells
@@ -110,21 +110,13 @@ in
   ];
 
   # macOS Chrome is installed by Homebrew with the other desktop apps.
-  programs.chromium = lib.mkIf isLinux (
-    let
-      hostSystem = pkgs.stdenv.hostPlatform.system;
-      chromeMetaPlatforms =
-        if pkgs ? google-chrome then (pkgs.google-chrome.meta.platforms or [ ]) else [ ];
-      canUseChrome = lib.elem hostSystem chromeMetaPlatforms;
-    in
-    {
-      enable = true;
-      package = if canUseChrome then pkgs.google-chrome else pkgs.chromium;
-      extensions = [
-        "nngceckbapebfimnlniiiahkandclblb" # Bitwarden
-      ];
-    }
-  );
+  programs.chromium = lib.mkIf isLinux {
+    enable = true;
+    package = pkgs.chromium;
+    extensions = [
+      "nngceckbapebfimnlniiiahkandclblb" # Bitwarden
+    ];
+  };
 
   home.packages = lib.optionals isLinux [
     pkgs.bitwarden-desktop

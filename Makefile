@@ -8,7 +8,7 @@ HOST ?= $(shell if [ "$$(uname -s)" = Darwin ] && [ "$$(scutil --get LocalHostNa
 
 # Darwin vs Linux switch command
 ifneq ($(filter $(HOST),mac neo),)
-  SWITCH = sudo nix run --no-write-lock-file .\#darwin-rebuild -- switch --flake .\#$(HOST)
+  SWITCH = sudo -H nix run --no-write-lock-file .\#darwin-rebuild -- switch --flake .\#$(HOST)
   BUILD  = nix run --no-write-lock-file .\#darwin-rebuild -- build --flake .\#$(HOST)
 else ifeq ($(HOST),vm)
   SWITCH = sudo nixos-rebuild switch --flake .\#$(HOST)

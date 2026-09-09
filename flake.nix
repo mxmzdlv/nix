@@ -54,9 +54,11 @@
 
               nix-homebrew = {
                 enable = true;
-                enableRosetta = true;
+                # Both Macs use native ARM Homebrew; no Intel prefix is needed.
+                enableRosetta = false;
                 autoMigrate = true;
                 user = "maxim";
+                trust.formulae = [ "oven-sh/bun/bun" ];
               };
 
               homebrew = {

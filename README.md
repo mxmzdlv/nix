@@ -147,6 +147,10 @@ The first run downloads packages and installs Homebrew and the configured apps,
 so allow it to finish. If either command fails, resolve the reported error and
 rerun that command before continuing.
 
+The Mac setup manages only native ARM Homebrew at `/opt/homebrew`. Intel
+Homebrew under `/usr/local` is not needed. Some apps may still prompt to install
+Rosetta for their own Intel components.
+
 On the original Mac, use `HOST=mac` in both commands instead. Both Macs share
 packages and home configuration; Neo gets its own hostname and `neo.local` name.
 
@@ -245,6 +249,11 @@ To update the Nix packages, including Go and Rust, run `make update`, then
 `make check`, `make build`, and `make switch`. Review and commit the changed
 `flake.lock` so other machines use the same versions.
 
+The Homebrew runtime itself is pinned by `nix-homebrew` in `flake.lock`.
+`brew update` refreshes package metadata and taps; it cannot update that runtime.
+Use `make update`, then rebuild and switch, to update Homebrew itself. Updating
+the inputs together also supplies the Ruby version required by nix-homebrew.
+
 Homebrew packages are separate from `flake.lock`. `make switch` installs missing
 packages but does not upgrade existing ones. To upgrade a particular package:
 
@@ -285,6 +294,42 @@ command -v cargo
 On a clean Neo install, these resolve to the Nix toolchains. On the original Mac,
 the existing installations are preserved; choosing to migrate them is separate
 from installing this configuration.
+
+### If first activation fails
+
+Always work from `~/code/nix`. `make switch HOST=neo` uses `sudo -H` so root gets
+its own home directory without changing the working directory. Do not use
+`sudo -i` with a relative flake path: it changes to `/var/root`.
+
+If nix-darwin refuses to overwrite `/etc/zshenv`, inspect it first:
+
+```sh
+cat /etc/zshenv
+```
+
+If it only contains the old Nix installer setup, preserve it and retry:
+
+```sh
+sudo mv -n /etc/zshenv /etc/zshenv.before-nix-darwin
+make switch HOST=neo
+```
+
+If it contains other custom settings, preserve those settings in the configuration
+before continuing. Do not overwrite an existing backup.
+
+Errors such as `Unexpected method ... called on Cask` or exceptions in
+`Utils::Bottles.load_tab` can mean the pinned Homebrew runtime is too old for
+current package metadata. Update the flake inputs, build, and retry activation;
+`brew update` alone does not fix that mismatch. `make build` validates the Nix
+configuration, but Homebrew installs happen only during `make switch`.
+
+If an earlier attempt created an Intel prefix and it was later deleted, use this
+configuration with `enableRosetta = false`; activation will stop touching that
+prefix. Keep `/opt/homebrew` and its installed packages. A partial activation can
+be retried with `make switch HOST=neo`.
+
+Until activation finishes and you reopen Terminal, use
+`/opt/homebrew/bin/brew --version` to check the native installation directly.
 
 ## Notes sync
 
