@@ -73,6 +73,7 @@
                   "dune"
                   "postgresql@18"
                   "sqlite"
+                  "tokei"
                 ];
 
                 casks = [
