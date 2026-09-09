@@ -10,8 +10,14 @@ NOTES_DIR="${NOTES_DIR:-$HOME/notes}"
 NOTES_REMOTE_URL="${NOTES_REMOTE_URL:-git@github.com:mxmzdlv/notes.git}"
 last_remote_sync=$(date +%s)
 last_remote_alert=0
+sync_started=false
 
-log() { echo "notes-git-watch: $*" >&2; }
+log() {
+  # An unconfigured Mac is normal until the user sets up notes.
+  if [ "$sync_started" = true ]; then
+    echo "notes-git-watch: $*" >&2
+  fi
+}
 
 ready() {
   if ! cd "$NOTES_DIR" 2>/dev/null; then
@@ -33,16 +39,6 @@ ready() {
     log "configure git user.name and user.email before enabling sync"
     return 1
   fi
-  for marker in rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD BISECT_START; do
-    if [ -e "$(git rev-parse --git-path "$marker")" ]; then
-      log "Git operation in progress; waiting for manual resolution"
-      return 1
-    fi
-  done
-  if [ -n "$(git ls-files --unmerged)" ]; then
-    log "unresolved conflicts; waiting for manual resolution"
-    return 1
-  fi
   branch=$(git symbolic-ref --quiet --short HEAD) || {
     log "detached HEAD; select a branch before syncing"
     return 1
@@ -56,6 +52,20 @@ ready() {
     return 1
   fi
   remote_branch=${merge_ref#refs/heads/}
+  if [ "$sync_started" = false ]; then
+    sync_started=true
+    last_remote_sync=$(date +%s)
+  fi
+  for marker in rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD BISECT_START; do
+    if [ -e "$(git rev-parse --git-path "$marker")" ]; then
+      log "Git operation in progress; waiting for manual resolution"
+      return 1
+    fi
+  done
+  if [ -n "$(git ls-files --unmerged)" ]; then
+    log "unresolved conflicts; waiting for manual resolution"
+    return 1
+  fi
 }
 
 sync_once() {
@@ -87,6 +97,7 @@ sync_once() {
 }
 
 notify_stale_sync() {
+  [ "$sync_started" = true ] || return 0
   local now
   now=$(date +%s)
   if [ $((now - last_remote_sync)) -ge 300 ] && [ $((now - last_remote_alert)) -ge 300 ]; then

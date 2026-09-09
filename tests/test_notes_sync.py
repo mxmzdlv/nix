@@ -61,6 +61,72 @@ class NotesSyncTest(unittest.TestCase):
             self.assertEqual(self.git(repo, "status", "--porcelain"), "")
         self.assertEqual(self.git(self.a, "rev-parse", "HEAD"), self.git(self.b, "rev-parse", "HEAD"))
 
+    def watch_cycles(self, repo, setup_after_first_cycle=False):
+        """Run three cycles with a fake clock; never sleep or send notifications."""
+        commands = self.root / "commands"
+        commands.mkdir(exist_ok=True)
+        counter = self.root / "cycles"
+        counter.write_text("0")
+        scripts = {
+            "date": '''#!/bin/sh
+if [ "$1" = +%s ]; then
+  echo $((1000 + 600 * $(cat "$TEST_CYCLES")))
+else
+  exec "$TEST_DATE" "$@"
+fi
+''',
+            "uname": "#!/bin/sh\necho Linux\n",
+            "sleep": '''#!/bin/sh
+count=$((1 + $(cat "$TEST_CYCLES")))
+echo "$count" > "$TEST_CYCLES"
+if [ "$count" = 1 ] && [ "$TEST_SETUP" = yes ]; then
+  git clone "$NOTES_REMOTE_URL" "$NOTES_DIR" >/dev/null 2>&1 || exit 98
+  git -C "$NOTES_DIR" config user.name "Notes Test"
+  git -C "$NOTES_DIR" config user.email notes@example.invalid
+fi
+if [ "$count" -ge 3 ]; then exit 99; fi
+''',
+        }
+        for name, body in scripts.items():
+            path = commands / name
+            path.write_text(body)
+            path.chmod(0o755)
+        env = self.env | {
+            "PATH": str(commands) + os.pathsep + self.env["PATH"],
+            "NOTES_DIR": str(repo), "NOTES_REMOTE_URL": str(self.remote),
+            "TEST_CYCLES": str(counter), "TEST_DATE": shutil.which("date"),
+            "TEST_SETUP": "yes" if setup_after_first_cycle else "no",
+        }
+        result = subprocess.run(["bash", str(SCRIPT)], env=env, capture_output=True,
+                                text=True, timeout=25)
+        self.assertEqual(result.returncode, 99, result.stdout + result.stderr)
+        return result
+
+    def test_unconfigured_watcher_stays_quiet_past_alert_deadline(self):
+        self.git(self.a, "remote", "set-url", "origin", "unexpected-local-path")
+        self.git(self.b, "config", "--unset", "user.email")
+        for repo in [self.root / "missing", self.a, self.b]:
+            with self.subTest(repo=repo):
+                result = self.watch_cycles(repo)
+                self.assertEqual(result.stdout, "")
+                self.assertEqual(result.stderr, "")
+
+    def test_watcher_starts_when_clone_appears(self):
+        repo = self.root / "later"
+        result = self.watch_cycles(repo, setup_after_first_cycle=True)
+        self.assertNotIn("sync incomplete", result.stderr)
+        self.assertNotIn("no complete remote sync", result.stderr)
+        self.assertEqual(self.git(repo, "rev-parse", "HEAD"),
+                         self.git(self.remote, "rev-parse", "main"))
+
+    def test_configured_watcher_still_alerts_on_failure(self):
+        marker = self.a / ".git/MERGE_HEAD"
+        marker.write_text(self.git(self.a, "rev-parse", "HEAD") + "\n")
+        result = self.watch_cycles(self.a)
+        self.assertIn("Git operation in progress", result.stderr)
+        self.assertIn("no complete remote sync for over five minutes", result.stderr)
+        self.assertTrue(marker.exists())
+
     def test_failed_push_is_retried_without_new_edits(self):
         hook = self.remote / "hooks/pre-receive"
         hook.write_text("#!/bin/sh\nexit 1\n")

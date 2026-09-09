@@ -32,6 +32,7 @@ check:
 	nix flake check
 	nix eval --no-write-lock-file .\#darwinConfigurations.mac.system.drvPath
 	nix eval --no-write-lock-file .\#darwinConfigurations.neo.system.drvPath
+	nix eval --no-write-lock-file .\#nixosConfigurations.vm.config.system.build.toplevel.drvPath
 
 fmt:
 	nix fmt

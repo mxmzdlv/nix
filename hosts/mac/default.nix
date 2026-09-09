@@ -19,6 +19,11 @@
   # Use Determinate-managed Nix instead of nix-darwin's built-in management
   nix.enable = false;
 
+  # Disable Spotlight indexing on the startup disk's system and data volumes.
+  system.activationScripts.postActivation.text = ''
+    /usr/bin/mdutil -i off / /System/Volumes/Data
+  '';
+
   # Required by nix-darwin; update only after reviewing release notes
   system.stateVersion = 6;
 }

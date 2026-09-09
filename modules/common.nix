@@ -4,14 +4,7 @@
     "nix-command"
     "flakes"
   ];
-  # nix.settings.auto-optimise-store = true;
-  # nix.gc = {
-  #   automatic = true;
-  #   dates = "weekly";
-  #   options = "--delete-older-than 14d";
-  # };
-
-  # Cross-platform packages (keep it conservative here)
+  # Command-line tools available on every host.
   environment.systemPackages = with pkgs; [
     git
     xh
@@ -26,7 +19,12 @@
     unzip
     bat
     zoxide
-    tmux
+    go
+    rustc
+    cargo
+    rustfmt
+    clippy
+    rust-analyzer
   ];
 
   programs.zsh.enable = true;

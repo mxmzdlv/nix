@@ -1,10 +1,7 @@
-# modules/home/common.nix
 {
   config,
   lib,
   pkgs,
-  isWSL ? false,
-  inputs ? { },
   ...
 }:
 
@@ -62,26 +59,24 @@ let
       git commit -m "$msg"
     '';
     copy = ''
-      function copy
-          if test (count $argv) -gt 0
-              set dir $argv[1]
-          else
-              set dir .
-          end
-
-          find $dir \
-              \( -name .git -o -name _build -o -name .zig_cache -o -name zig-out \) -prune -o \
-              -type f \
-              ! -iname '*.db*' \
-              ! -iname '*.parquet*' \
-              ! -name '.*' \
-              -print0 \
-              | xargs -0 awk '
-                  FNR == 1 { printf("==> %s <==\n", FILENAME) }
-                  { print }
-              ' \
-              | pbcopy
+      if test (count $argv) -gt 0
+        set dir $argv[1]
+      else
+        set dir .
       end
+
+      find $dir \
+        \( -name .git -o -name _build -o -name .zig_cache -o -name zig-out \) -prune -o \
+        -type f \
+        ! -iname '*.db*' \
+        ! -iname '*.parquet*' \
+        ! -name '.*' \
+        -print0 \
+        | xargs -0 awk '
+            FNR == 1 { printf("==> %s <==\n", FILENAME) }
+            { print }
+          ' \
+        | pbcopy
     '';
   };
   notesGitWatch = pkgs.writeShellScript "notes-git-watch" (
@@ -101,17 +96,21 @@ in
   home.stateVersion = "25.11";
   home.sessionVariables = {
     LANG = "en_US.UTF-8";
-  }
-  // (if isDarwin then { } else { });
+  };
 
-  home.sessionPath = lib.optionals isDarwin [
+  home.sessionPath = [
     "${config.home.homeDirectory}/.local/bin"
+    "${config.home.homeDirectory}/.cargo/bin"
+    "${config.home.homeDirectory}/go/bin"
+  ]
+  ++ lib.optionals isDarwin [
+    "/opt/homebrew/opt/postgresql@18/bin"
     "/opt/homebrew/bin"
     "/opt/homebrew/sbin"
-    "${config.home.homeDirectory}/go/bin"
   ];
 
-  programs.chromium =
+  # macOS Chrome is installed by Homebrew with the other desktop apps.
+  programs.chromium = lib.mkIf isLinux (
     let
       hostSystem = pkgs.stdenv.hostPlatform.system;
       chromeMetaPlatforms =
@@ -124,18 +123,17 @@ in
       extensions = [
         "nngceckbapebfimnlniiiahkandclblb" # Bitwarden
       ];
-    };
+    }
+  );
 
-  home.packages = lib.optionals (!isDarwin) [
+  home.packages = lib.optionals isLinux [
     pkgs.bitwarden-desktop
-    pkgs.localsend
-    pkgs.mpv
     pkgs.zed-editor
     pkgs.vscode
     pkgs.ghostty
   ];
 
-  dconf.settings = {
+  dconf.settings = lib.mkIf isLinux {
     # App switching with Super+1..9 (GNOME Shell)
     "org/gnome/shell/keybindings" = {
       switch-to-application-1 = [ ];
@@ -149,20 +147,27 @@ in
       switch-to-application-9 = [ ];
       # Disable overview on bare Super press so it can be remapped by the tiling WM
       toggle-overview = [ "<Super>space" ];
-
     };
   };
 
   # Shared application configuration synced into XDG config directory
-  xdg.configFile =
-    lib.optionalAttrs isLinux {
-      "ghostty/config".text = builtins.readFile ./ghostty + "\n" + builtins.readFile ./ghostty-keybinds;
-    }
-    // {
-      # Link the macOS Zed settings to this checkout so edits apply without rebuilding.
-      "zed/settings.json".source =
-        if isDarwin then outOfStoreConfig "modules/home/zed.json" else ./zed.json;
-    };
+  xdg.configFile = {
+    "ghostty/config".text =
+      if isDarwin then
+        ''
+          theme = niji
+          macos-titlebar-style = tabs
+          command = ${pkgs.fish}/bin/fish
+          keybind = shift+enter=text:\x1b\r
+          shell-integration = fish
+          notify-on-command-finish = unfocused
+        ''
+      else
+        builtins.readFile ./ghostty + "\n" + builtins.readFile ./ghostty-keybinds;
+    # Link the macOS Zed settings to this checkout so edits apply without rebuilding.
+    "zed/settings.json".source =
+      if isDarwin then outOfStoreConfig "modules/home/zed.json" else ./zed.json;
+  };
 
   # Sync an existing, configured ~/notes clone every 10 seconds on macOS
   launchd.agents.notes-git-watch = lib.mkIf isDarwin {
@@ -218,11 +223,12 @@ in
       codex-b = ''
         CODEX_HOME=~/.codex-b codex $argv
       '';
-      develop = ''
-        function develop --wraps='nix develop'
-          env ANY_NIX_SHELL_PKGS=(basename (pwd))"#"(git describe --tags --dirty) (type -P nix) develop --command fish
-        end
-      '';
+      develop = {
+        wraps = "nix develop";
+        body = ''
+          env ANY_NIX_SHELL_PKGS=(basename (pwd))"#"(git describe --tags --dirty) (type -P nix) develop $argv --command fish
+        '';
+      };
     };
     interactiveShellInit = ''
       if type -q opam

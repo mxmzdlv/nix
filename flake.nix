@@ -12,7 +12,6 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       darwin,
       home-manager,
@@ -20,13 +19,12 @@
       ...
     }:
     let
-      # Adjust these if your arch differs:
       macSystem = "aarch64-darwin";
       linuxSystem = "aarch64-linux";
 
       mkHMUser =
         username:
-        { pkgs, ... }:
+        { ... }:
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
@@ -71,14 +69,20 @@
                 brews = [
                   "oven-sh/bun/bun"
                   "dune"
+                  "postgresql@18"
                   "sqlite"
                 ];
 
                 casks = [
                   "bitwarden"
                   "ghostty"
-                  "localsend"
-                  "mpv"
+                  "google-chrome"
+                  "tailscale-app"
+                  "orbstack"
+                  "telegram"
+                  "transmission"
+                  "iina"
+                  "steam"
                   "visual-studio-code"
                   "zed"
                   "codex"
@@ -97,16 +101,6 @@
       );
 
       nixosConfigurations = {
-        # pc = nixpkgs.lib.nixosSystem {
-        #   system = linuxSystem;
-        #   modules = sharedModules ++ [
-        #     ./hosts/pc/hardware-configuration.nix
-        #     ./hosts/pc
-        #     home-manager.nixosModules.home-manager
-        #     (mkHMUser "maxim")
-        #   ];
-        # };
-
         vm = nixpkgs.lib.nixosSystem {
           system = linuxSystem;
           modules = sharedModules ++ [
