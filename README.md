@@ -189,22 +189,25 @@ through Nix on every host. Their versions follow `flake.lock`.
 
 ### Spotlight indexing
 
-`make switch` disables Spotlight indexing on the startup disk's system and data
-volumes on both Macs. This reduces Spotlight/Finder file-search functionality.
-Check the status after activation:
+This repo leaves Spotlight indexing at the macOS default (on). An earlier
+version disabled it from a `postActivation` script on every `make switch`; that
+block is gone, but removing it does not re-index anything by itself. If a Mac
+still has indexing off from that era, turn it back on once:
+
+```sh
+sudo mdutil -i on / /System/Volumes/Data
+```
+
+Check the status at any time:
 
 ```sh
 mdutil -s / /System/Volumes/Data
 ```
 
-Both volumes should report indexing disabled, or `mdutil` may report that the
-Spotlight server is disabled. External disks are not changed.
-To re-enable indexing, remove the `postActivation` block in
-`hosts/mac/default.nix`, apply the configuration, then run:
-
-```sh
-sudo mdutil -i on / /System/Volumes/Data
-```
+Both volumes should report indexing enabled. The first index after re-enabling
+takes a while and is CPU- and disk-heavy. If Spotlight results stay incomplete,
+force a rebuild from scratch with `sudo mdutil -E /`. External disks are not
+changed either way.
 
 ### PostgreSQL
 
