@@ -71,6 +71,7 @@
                 brews = [
                   "oven-sh/bun/bun"
                   "dune"
+                  "herdr"
                   "postgresql@18"
                   "sqlite"
                   "tokei"
